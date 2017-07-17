@@ -8,6 +8,7 @@ using Server.MirObjects;
 using C = ClientPackets;
 using S = ServerPackets;
 using System.Linq;
+using System.Diagnostics;
 
 namespace Server.MirNetwork
 {
@@ -17,6 +18,8 @@ namespace Server.MirNetwork
     {
         public readonly int SessionID;
         public readonly string IPAddress;
+
+        public bool Checksum = false;
 
         public GameStage Stage;
 
@@ -132,9 +135,39 @@ namespace Server.MirNetwork
 
             Packet p;
             while ((p = Packet.ReceivePacket(_rawData, out _rawData)) != null)
+            {
+                if (Checksum == false && p is ClientPackets.ClientVersion) Checksum = true;
                 _receiveList.Enqueue(p);
+            }
 
             BeginReceive();
+
+            if (!Checksum)
+            {
+                SMain.Enqueue(string.Format("※※※ Unknown Packet Detected !! ※※※ ({0})", IPAddress));
+                //IPBlock(IPAddress);
+                Disconnect(0);
+            }
+        }
+        private void IPBlock(string IP)
+        {
+            ProcessStartInfo cmdStartInfo = new ProcessStartInfo();
+            cmdStartInfo.FileName = @"C:\Windows\System32\cmd.exe";
+            cmdStartInfo.RedirectStandardOutput = false;
+            cmdStartInfo.RedirectStandardError = false;
+            cmdStartInfo.RedirectStandardInput = true;
+            cmdStartInfo.UseShellExecute = false;
+            cmdStartInfo.CreateNoWindow = true;
+
+            Process cmdProcess = new Process();
+            cmdProcess.StartInfo = cmdStartInfo;
+            cmdProcess.EnableRaisingEvents = true;
+            cmdProcess.Start();
+
+            cmdProcess.StandardInput.WriteLine("netsh ipsec static add filter filterlist=Test srcaddr=any dstaddr=" + IP + " protocol=any");
+            cmdProcess.StandardInput.WriteLine("exit");
+
+            SMain.Enqueue(string.Format("아이피차단: ({0})", IP));
         }
         private void BeginSend(List<byte> data)
         {

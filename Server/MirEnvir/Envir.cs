@@ -1843,7 +1843,7 @@ namespace Server.MirEnvir
         {
             (new Thread(() =>
             {
-                SMain.Enqueue("Server rebooting...");
+                SMain.Enqueue("서버를 재시작합니다...");
                 Stop();
                 Start();
             })).Start();
@@ -1863,7 +1863,7 @@ namespace Server.MirEnvir
 
             for (int i = 0; i < MapInfoList.Count; i++)
                 MapInfoList[i].CreateMap();
-            SMain.Enqueue(string.Format("{0} Maps Loaded.", MapInfoList.Count));
+            SMain.Enqueue(string.Format("{0}개의 지도 데이터를 불러왔습니다.", MapInfoList.Count));
 
             for (int i = 0; i < ItemInfoList.Count; i++)
             {
@@ -1878,7 +1878,9 @@ namespace Server.MirEnvir
             LoadAwakeningMaterials();
             LoadStrongBoxDrops();
             LoadBlackStoneDrops();
-            SMain.Enqueue("Drops Loaded.");
+            SMain.Enqueue("몬스터 드랍정보를 불러왔습니다.");
+            SMain.Enqueue("낚시 드랍정보를 불러왔습니다.");
+            SMain.Enqueue("각성 재료정보를 불러왔습니다.");
 
             if (DragonInfo.Enabled)
             {
@@ -1888,14 +1890,14 @@ namespace Server.MirEnvir
                     if (DragonSystem.Load()) DragonSystem.Info.LoadDrops();
                 }
 
-                SMain.Enqueue("Dragon Loaded.");
+                SMain.Enqueue("파천마룡 데이터를 불러왔습니다.");
             }
 
             DefaultNPC = new NPCObject(new NPCInfo() { Name = "DefaultNPC", FileName = Settings.DefaultNPCFilename, IsDefault = true });
             MonsterNPC = new NPCObject(new NPCInfo() { Name = "MonsterNPC", FileName = Settings.MonsterNPCFilename, IsDefault = true });
             RobotNPC = new NPCObject(new NPCInfo() { Name = "RobotNPC", FileName = Settings.RobotNPCFilename, IsDefault = true, IsRobot = true });
 
-            SMain.Enqueue("Envir Started.");
+            SMain.Enqueue("중앙서버가 시작되었습니다.");
         }
         private void StartNetwork()
         {
@@ -1917,7 +1919,7 @@ namespace Server.MirEnvir
                 _StatusPort.Start();
                 _StatusPort.BeginAcceptTcpClient(StatusConnection, null);
             }
-            SMain.Enqueue("Network Started.");
+            SMain.Enqueue("네트워크서버가 시작되었습니다.");
 
             //FixGuilds();
         }
@@ -1936,7 +1938,7 @@ namespace Server.MirEnvir
 
             GC.Collect();
 
-            SMain.Enqueue("Envir Stopped.");
+            SMain.Enqueue("중앙서버가 정지되었습니다.");
         }
         private void StopNetwork()
         {
@@ -1982,7 +1984,7 @@ namespace Server.MirEnvir
 
 
             StatusConnections.Clear();
-            SMain.Enqueue("Network Stopped.");
+            SMain.Enqueue("네트워크서버가 정지되었습니다.");
         }
 
         private void CleanUp()

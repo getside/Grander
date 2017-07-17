@@ -3117,6 +3117,7 @@ namespace Server.MirEnvir
                 }
             }
             //next class based top
+            /*
             if (info.Level >= RankBottomLevel[(byte)info.Class + 1])
             {
                 Ranking = RankTop;
@@ -3130,6 +3131,7 @@ namespace Server.MirEnvir
                     }
                 }
             }
+            */
         }
 
         public void CheckRankUpdate(CharacterInfo info)

@@ -388,6 +388,9 @@ namespace Client.MirScenes.Dialogs
             GameScene.Scene.RefineDialog.Hide();
             GameScene.Scene.StorageDialog.Hide();
             GameScene.Scene.TrustMerchantDialog.Hide();
+            GameScene.Scene.TransformImageDialog.Hide();//stupple
+            GameScene.Scene.TransformBackDialog.Hide();//stupple
+            GameScene.Scene.HumupTransformDialog.Hide();//stupple
             GameScene.Scene.InventoryDialog.Location = new Point(0, 0);
         }
 

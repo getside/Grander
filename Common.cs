@@ -11,8 +11,8 @@ using System.Linq;
 using static ItemInfo;
 
 public enum BlendMode : sbyte
-{ 
-    NONE = -1, 
+{
+    NONE = -1,
     NORMAL = 0,
     LIGHT = 1,
     LIGHTINV = 2,
@@ -61,7 +61,7 @@ public enum LevelEffects : byte
 
 public enum OutputMessageType : byte
 {
-    Normal, 
+    Normal,
     Quest,
     Guild
 }
@@ -327,7 +327,7 @@ public enum Monster : ushort
     HighAssassin = 146,
     DarkDustPile = 147,
     DarkBrownWolf = 148,
-    Football = 149, 
+    Football = 149,
     GingerBreadman = 150,
     HalloweenScythe = 151,
     GhastlyLeecher = 152,
@@ -350,10 +350,10 @@ public enum Monster : ushort
     RedTurtle = 169,//done
     GreenTurtle = 170,//done
     BlueTurtle = 171,//done
-        Catapult = 172, //not added frames //special 3 states in 1 
-        SabukWallSection = 173, //not added frames
-        NammandWallSection = 174, //not added frames
-        SiegeRepairman = 175, //not added frames
+    Catapult = 172, //not added frames //special 3 states in 1 
+    SabukWallSection = 173, //not added frames
+    NammandWallSection = 174, //not added frames
+    SiegeRepairman = 175, //not added frames
     BlueSanta = 176,//done
     BattleStandard = 177,//done
     //ArcherGuard2 = 178,//done
@@ -582,11 +582,11 @@ public enum Monster : ushort
     Reindeer = 397, //frames not added
     AngryReindeer = 398,
     CargoBox = 399,
-    
+
     Ram1 = 400,
     Ram2 = 401,
     Kite = 402,
-    
+
 
     EvilMir = 900,
     EvilMirBody = 901,
@@ -724,7 +724,7 @@ public enum MirDirection : byte
 
 public enum ObjectType : byte
 {
-    None= 0,
+    None = 0,
     Player = 1,
     Item = 2,
     Merchant = 3,
@@ -790,7 +790,7 @@ public enum ItemType : byte
     Reel = 32,
     Fish = 33,
     Quest = 34,
-	Awakening = 35,
+    Awakening = 35,
     Pets = 36,
     Transform = 37,
 }
@@ -1139,7 +1139,7 @@ public enum Spell : byte
     //Custom
     Blink = 151,
     Portal = 152,
-    
+
     //Map Events
     DigOutZombie = 200,
     Rubble = 201,
@@ -1464,7 +1464,7 @@ public enum ServerPacketIds : short
     MailSent,
     ParcelCollected,
     MailCost,
-	ResizeInventory,
+    ResizeInventory,
     ResizeStorage,
     NewIntelligentCreature,
     UpdateIntelligentCreatureList,
@@ -2109,7 +2109,7 @@ public static class Globals
         MaxChatLength = 80,
 
         MaxGroup = 15,
-        
+
         MaxAttackRange = 9,
 
         MaxDragonLevel = 13,
@@ -2409,7 +2409,7 @@ public static class Functions
                 p.Offset(-1, 0);
                 break;
             case MirDirection.DownLeft:
-                p.Offset(-1,-1);
+                p.Offset(-1, -1);
                 break;
             case MirDirection.Left:
                 p.Offset(0, -1);
@@ -2619,27 +2619,27 @@ public class SelectInfo
     public MirClass Class;
     public MirGender Gender;
     public DateTime LastAccess;
-    
-        public SelectInfo()
-        { }
-        public SelectInfo(BinaryReader reader)
-        {
-            Index = reader.ReadInt32();
-            Name = reader.ReadString();
-            Level = reader.ReadUInt16();
-            Class = (MirClass)reader.ReadByte();
-            Gender = (MirGender)reader.ReadByte();
-            LastAccess = DateTime.FromBinary(reader.ReadInt64());
-        }
-        public void Save(BinaryWriter writer)
-        {
-            writer.Write(Index);
-            writer.Write(Name);
-            writer.Write(Level);
-            writer.Write((byte)Class);
-            writer.Write((byte)Gender);
-            writer.Write(LastAccess.ToBinary());
-        }
+
+    public SelectInfo()
+    { }
+    public SelectInfo(BinaryReader reader)
+    {
+        Index = reader.ReadInt32();
+        Name = reader.ReadString();
+        Level = reader.ReadUInt16();
+        Class = (MirClass)reader.ReadByte();
+        Gender = (MirGender)reader.ReadByte();
+        LastAccess = DateTime.FromBinary(reader.ReadInt64());
+    }
+    public void Save(BinaryWriter writer)
+    {
+        writer.Write(Index);
+        writer.Write(Name);
+        writer.Write(Level);
+        writer.Write((byte)Class);
+        writer.Write((byte)Gender);
+        writer.Write(LastAccess.ToBinary());
+    }
 }
 
 public class ItemInfo
@@ -2652,7 +2652,7 @@ public class ItemInfo
     public RequiredClass RequiredClass = RequiredClass.None;
     public RequiredGender RequiredGender = RequiredGender.None;
     public ItemSet Set;
-    
+
     public short Shape;
     public byte Weight, Light, RequiredAmount;
 
@@ -2671,14 +2671,14 @@ public class ItemInfo
     public byte Strong;
     public byte MagicResist, PoisonResist, HealthRecovery, SpellRecovery, PoisonRecovery, HPrate, MPrate;
     public byte CriticalRate, CriticalDamage;
-    public bool NeedIdentify, ShowGroupPickup, GlobalDropNotify;
+    public bool NeedIdentify, ShowGroupPickup, GlobalDropNotify, BindOnEquip, BindNoSRepair;
     public bool ClassBased;
     public bool LevelBased;
     public bool CanMine;
     public bool CanFastRun;
     public bool CanAwakening;
     public byte MaxAcRate, MaxMacRate, Holy, Freezing, PoisonAttack, HpDrainRate;
-    
+
     public BindMode Bind = BindMode.none;
     public byte Reflect;
     public SpecialItemMode Unique = SpecialItemMode.None;
@@ -2694,7 +2694,7 @@ public class ItemInfo
 
     public string FriendlyName
     {
-        get 
+        get
         {
             string temp = Name;
             temp = Regex.Replace(temp, @"\d+$", string.Empty); //hides end numbers
@@ -2703,7 +2703,7 @@ public class ItemInfo
             return temp;
         }
     }
-    
+
     public ItemInfo()
     {
     }
@@ -2711,10 +2711,10 @@ public class ItemInfo
     {
         Index = reader.ReadInt32();
         Name = reader.ReadString();
-        Type = (ItemType) reader.ReadByte();
+        Type = (ItemType)reader.ReadByte();
         if (version >= 40) Grade = (ItemGrade)reader.ReadByte();
-        RequiredType = (RequiredType) reader.ReadByte();
-        RequiredClass = (RequiredClass) reader.ReadByte();
+        RequiredType = (RequiredType)reader.ReadByte();
+        RequiredClass = (RequiredClass)reader.ReadByte();
         //RequiredGender = (RequiredGender) reader.ReadByte();
         RequiredClass = (RequiredClass)(version <= 54 ? ConvertRequiredClass(reader.ReadByte()) : reader.ReadByte());
         if (version >= 17) Set = (ItemSet)reader.ReadByte();
@@ -2798,7 +2798,7 @@ public class ItemInfo
             {
                 Bind = (BindMode)reader.ReadInt16();
             }
-            
+
         }
         if (version >= 21)
         {
@@ -2830,7 +2830,7 @@ public class ItemInfo
         }
         if (version < 70) //before db version 70 all specialitems had wedding rings disabled, after that it became a server option
         {
-            if ((Type == ItemType.Ring) &&  (Unique != SpecialItemMode.None))
+            if ((Type == ItemType.Ring) && (Unique != SpecialItemMode.None))
                 Bind |= BindMode.NoWeddingRing;
         }
     }
@@ -2841,17 +2841,17 @@ public class ItemInfo
     {
         writer.Write(Index);
         writer.Write(Name);
-        writer.Write((byte) Type);
-        writer.Write((byte) Grade);
-        writer.Write((byte) RequiredType);
-        writer.Write((byte) RequiredClass);
-        writer.Write((byte) RequiredGender);
-        writer.Write((byte) Set);
+        writer.Write((byte)Type);
+        writer.Write((byte)Grade);
+        writer.Write((byte)RequiredType);
+        writer.Write((byte)RequiredClass);
+        writer.Write((byte)RequiredGender);
+        writer.Write((byte)Set);
 
         writer.Write(Shape);
         writer.Write(Weight);
         writer.Write(Light);
-        writer.Write(RequiredAmount);     
+        writer.Write(RequiredAmount);
 
         writer.Write(Image);
         writer.Write(Durability);
@@ -2913,7 +2913,7 @@ public class ItemInfo
         writer.Write((short)Unique);
         writer.Write(RandomStatsId);
         writer.Write(CanFastRun);
-		writer.Write(CanAwakening);
+        writer.Write(CanAwakening);
         writer.Write(ToolTip != null);
         if (ToolTip != null)
             writer.Write(ToolTip);
@@ -2949,7 +2949,8 @@ public class ItemInfo
         if (data.Length < 33) return null;
 
         ItemInfo info = new ItemInfo { Name = data[0] };
-
+        /*
+        if (!int.TryParse(data[0], out info.Index)) return null;
         if (!Enum.TryParse(data[1], out info.Type)) return null;
         if (!Enum.TryParse(data[2], out info.Grade)) return null;
         if (!Enum.TryParse(data[3], out info.RequiredType)) return null;
@@ -3020,14 +3021,93 @@ public class ItemInfo
         if (!bool.TryParse(data[60], out info.CanMine)) return null;
         if (!bool.TryParse(data[61], out info.CanFastRun)) return null;
 		if (!bool.TryParse(data[62], out info.CanAwakening)) return null;
-        if (data[63] == "-")
+        */
+
+        if (!int.TryParse(data[0], out info.Index)) return null;
+        if (!Enum.TryParse(data[2], out info.Type)) return null;
+        if (!Enum.TryParse(data[3], out info.Grade)) return null;
+        if (!Enum.TryParse(data[4], out info.RequiredType)) return null;
+        if (!Enum.TryParse(data[5], out info.RequiredClass)) return null;
+        if (!Enum.TryParse(data[6], out info.RequiredGender)) return null;
+        if (!Enum.TryParse(data[7], out info.Set)) return null;
+        if (!short.TryParse(data[8], out info.Shape)) return null;
+
+        if (!byte.TryParse(data[9], out info.Weight)) return null;
+        if (!byte.TryParse(data[10], out info.Light)) return null;
+        if (!byte.TryParse(data[11], out info.RequiredAmount)) return null;
+
+        if (!byte.TryParse(data[12], out info.MinAC)) return null;
+        if (!byte.TryParse(data[13], out info.MaxAC)) return null;
+        if (!byte.TryParse(data[14], out info.MinMAC)) return null;
+        if (!byte.TryParse(data[15], out info.MaxMAC)) return null;
+        if (!byte.TryParse(data[16], out info.MinDC)) return null;
+        if (!byte.TryParse(data[17], out info.MaxDC)) return null;
+        if (!byte.TryParse(data[18], out info.MinMC)) return null;
+        if (!byte.TryParse(data[19], out info.MaxMC)) return null;
+        if (!byte.TryParse(data[20], out info.MinSC)) return null;
+        if (!byte.TryParse(data[21], out info.MaxSC)) return null;
+        if (!byte.TryParse(data[22], out info.Accuracy)) return null;
+        if (!byte.TryParse(data[23], out info.Agility)) return null;
+        if (!ushort.TryParse(data[24], out info.HP)) return null;
+        if (!ushort.TryParse(data[25], out info.MP)) return null;
+
+        if (!sbyte.TryParse(data[26], out info.AttackSpeed)) return null;
+        if (!sbyte.TryParse(data[27], out info.Luck)) return null;
+
+        if (!byte.TryParse(data[28], out info.BagWeight)) return null;
+
+        if (!byte.TryParse(data[29], out info.HandWeight)) return null;
+        if (!byte.TryParse(data[30], out info.WearWeight)) return null;
+
+        if (!bool.TryParse(data[31], out info.StartItem)) return null;
+
+        if (!ushort.TryParse(data[32], out info.Image)) return null;
+        if (!ushort.TryParse(data[33], out info.Durability)) return null;
+        if (!uint.TryParse(data[34], out info.Price)) return null;
+        if (!uint.TryParse(data[35], out info.StackSize)) return null;
+        if (!byte.TryParse(data[36], out info.Effect)) return null;
+
+        if (!byte.TryParse(data[37], out info.Strong)) return null;
+        if (!byte.TryParse(data[38], out info.MagicResist)) return null;
+        if (!byte.TryParse(data[39], out info.PoisonResist)) return null;
+        if (!byte.TryParse(data[40], out info.HealthRecovery)) return null;
+        if (!byte.TryParse(data[41], out info.SpellRecovery)) return null;
+        if (!byte.TryParse(data[42], out info.PoisonRecovery)) return null;
+        if (!byte.TryParse(data[43], out info.HPrate)) return null;
+        if (!byte.TryParse(data[44], out info.MPrate)) return null;
+        if (!byte.TryParse(data[45], out info.CriticalRate)) return null;
+        if (!byte.TryParse(data[46], out info.CriticalDamage)) return null;
+        if (!bool.TryParse(data[47], out info.NeedIdentify)) return null;
+        if (!bool.TryParse(data[48], out info.ShowGroupPickup)) return null;
+        if (!byte.TryParse(data[49], out info.MaxAcRate)) return null;
+        if (!byte.TryParse(data[50], out info.MaxMacRate)) return null;
+        if (!byte.TryParse(data[51], out info.Holy)) return null;
+        if (!byte.TryParse(data[52], out info.Freezing)) return null;
+        if (!byte.TryParse(data[53], out info.PoisonAttack)) return null;
+        if (!bool.TryParse(data[54], out info.ClassBased)) return null;
+        if (!bool.TryParse(data[55], out info.LevelBased)) return null;
+        if (!Enum.TryParse(data[56], out info.Bind)) return null;
+        if (!bool.TryParse(data[57], out info.BindOnEquip)) return null;
+        if (!byte.TryParse(data[58], out info.Reflect)) return null;
+        if (!byte.TryParse(data[59], out info.HpDrainRate)) return null;
+        if (!Enum.TryParse(data[60], out info.Unique)) return null;
+        if (!bool.TryParse(data[61], out info.BindNoSRepair)) return null;
+        if (!byte.TryParse(data[62], out info.RandomStatsId)) return null;
+        if (!bool.TryParse(data[63], out info.CanMine)) return null;
+        if (!bool.TryParse(data[64], out info.CanFastRun)) return null;
+        if (!bool.TryParse(data[65], out info.CanAwakening)) return null;
+
+        //if (data[63] == "-")
+        if (data[66] == "-")
             info.ToolTip = "";
         else
         {
-            info.ToolTip = data[63];
-            info.ToolTip = info.ToolTip.Replace("&^&", "\r\n");
+            //info.ToolTip = data[63];
+            info.ToolTip = data[66];
+            //info.ToolTip = info.ToolTip.Replace("&^&", "\r\n");
+            info.ToolTip = info.ToolTip.Replace("$^$", ",");
         }
-            
+
         return info;
 
     }
@@ -3035,7 +3115,8 @@ public class ItemInfo
     public string ToText()
     {
         string TransToolTip = ToolTip;
-        int length = TransToolTip.Length;
+        //int length = TransToolTip.Length;
+        int length = (TransToolTip != null) ? TransToolTip.Length : 0;
 
         if (TransToolTip == null || TransToolTip.Length == 0)
         {
@@ -3044,8 +3125,10 @@ public class ItemInfo
         else
         {
             TransToolTip = TransToolTip.Replace("\r\n", "&^&");
+            TransToolTip = TransToolTip.Replace(",", "$^$");
         }
 
+        /*
         return string.Format("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15},{16},{17},{18},{19},{20},{21},{22},{23},{24},{25},{26}," +
                              "{27},{28},{29},{30},{31},{32},{33},{34},{35},{36},{37},{38},{39},{40},{41},{42},{43},{44},{45},{46},{47},{48},{49},{50},{51}," +
                              "{52},{53},{54},{55},{56},{57},{58},{59},{60},{61},{62},{63}",
@@ -3054,12 +3137,23 @@ public class ItemInfo
             StackSize, Effect, Strong, MagicResist, PoisonResist, HealthRecovery, SpellRecovery, PoisonRecovery, HPrate, MPrate, CriticalRate, CriticalDamage, NeedIdentify,
             ShowGroupPickup, MaxAcRate, MaxMacRate, Holy, Freezing, PoisonAttack, ClassBased, LevelBased, (short)Bind, Reflect, HpDrainRate, (short)Unique,
             RandomStatsId, CanMine, CanFastRun, CanAwakening, TransToolTip);
+        */
+
+        return string.Format("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15},{16},{17},{18},{19},{20},{21},{22},{23},{24},{25},{26}," +
+                               "{27},{28},{29},{30},{31},{32},{33},{34},{35},{36},{37},{38},{39},{40},{41},{42},{43},{44},{45},{46},{47},{48},{49},{50},{51}," +
+                              "{52},{53},{54},{55},{56},{57},{58},{59},{60},{61},{62},{63},{64},{65},{66}",
+             Index, Name, (byte)Type, (byte)Grade, (byte)RequiredType, (byte)RequiredClass, (byte)RequiredGender, (byte)Set, Shape, Weight, Light, RequiredAmount, MinAC, MaxAC, MinMAC, MaxMAC, MinDC, MaxDC,
+              MinMC, MaxMC, MinSC, MaxSC, Accuracy, Agility, HP, MP, AttackSpeed, Luck, BagWeight, HandWeight, WearWeight, StartItem, Image, Durability, Price,
+              StackSize, Effect, Strong, MagicResist, PoisonResist, HealthRecovery, SpellRecovery, PoisonRecovery, HPrate, MPrate, CriticalRate, CriticalDamage, NeedIdentify,
+              ShowGroupPickup, MaxAcRate, MaxMacRate, Holy, Freezing, PoisonAttack, ClassBased, LevelBased, (byte)Bind, BindOnEquip, Reflect, HpDrainRate, (short)Unique, BindNoSRepair,
+              RandomStatsId, CanMine, CanFastRun, CanAwakening, TransToolTip);
     }
 
     public override string ToString()
     {
         return string.Format("{0}: {1}", Index, Name);
     }
+
 
     public class TransformData
     {
@@ -3125,7 +3219,7 @@ public class UserItem
     public ExpireInfo ExpireInfo;
     public RentalInformation RentalInformation;
 
-	public Awake Awake = new Awake();
+    public Awake Awake = new Awake();
     public bool IsAdded
     {
         get
@@ -3137,14 +3231,14 @@ public class UserItem
 
     public uint Weight
     {
-        get { return Info.Type == ItemType.Amulet ? Info.Weight : Info.Weight*Count; }
+        get { return Info.Type == ItemType.Amulet ? Info.Weight : Info.Weight * Count; }
     }
 
     public string Name
     {
-        get { return Count > 1 ? string.Format("{0} ({1})", Info.Name, Count) : Info.Name; }   
+        get { return Count > 1 ? string.Format("{0} ({1})", Info.Name, Count) : Info.Name; }
     }
-    
+
     public string FriendlyName
     {
         get { return Count > 1 ? string.Format("{0} ({1})", Info.FriendlyName, Count) : Info.FriendlyName; }
@@ -3184,7 +3278,7 @@ public class UserItem
 
         if (version <= 19) return;
         SoulBoundId = reader.ReadInt32();
-        byte Bools = reader.ReadByte();        
+        byte Bools = reader.ReadByte();
         Identified = (Bools & 0x01) == 0x01;
         Cursed = (Bools & 0x02) == 0x02;
         Strong = reader.ReadByte();
@@ -3197,7 +3291,7 @@ public class UserItem
         CriticalDamage = reader.ReadByte();
         Freezing = reader.ReadByte();
         PoisonAttack = reader.ReadByte();
-        
+
 
         if (version <= 31) return;
 
@@ -3218,7 +3312,7 @@ public class UserItem
         Awake = new Awake(reader);
 
         if (version <= 54) return;//stupple
-        
+
         IsTransform = reader.ReadBoolean(); // 데이터베이스
         Transform = new TransformData(reader, version); // 데이터베이스
 
@@ -3265,7 +3359,7 @@ public class UserItem
         writer.Write(AttackSpeed);
         writer.Write(Luck);
         writer.Write(SoulBoundId);
-        byte Bools=0;        
+        byte Bools = 0;
         if (Identified) Bools |= 0x01;
         if (Cursed) Bools |= 0x02;
         writer.Write(Bools);
@@ -3291,7 +3385,7 @@ public class UserItem
 
         writer.Write(GemCount);
 
-       
+
         Awake.Save(writer);
 
         writer.Write(IsTransform);
@@ -3333,7 +3427,7 @@ public class UserItem
 
 
         p = (uint)(p * ((AC + MAC + DC + MC + SC + Accuracy + Agility + HP + MP + AttackSpeed + Luck + Strong + MagicResist + PoisonResist + HealthRecovery + ManaRecovery + PoisonRecovery + CriticalRate + CriticalDamage + Freezing + PoisonAttack) * 0.1F + 1F));
-        
+
 
         return p * Count;
     }
@@ -3373,7 +3467,7 @@ public class UserItem
         uint p = 1500;
 
         p = (uint)((p * (1 + Awake.getAwakeLevel() * 2)) * (uint)Info.Grade);
-       
+
         return p;
     }
 
@@ -3462,9 +3556,8 @@ public class UserItem
                         }
                     }
                     break;
+                    #endregion
             }
-
-            #endregion
 
             if (IsTransform)
                 return Transform.Image;
@@ -3612,7 +3705,7 @@ public class GameShopItem
     public bool Deal = false;
     public bool TopItem = false;
     public DateTime Date;
-    
+
     public GameShopItem()
     {
     }
@@ -3967,7 +4060,7 @@ public class ClientMagic
         writer.Write(Range);
         writer.Write(CastTime);
     }
-   
+
 }
 
 public class ClientAuction
@@ -3980,7 +4073,7 @@ public class ClientAuction
 
     public ClientAuction()
     {
-        
+
     }
     public ClientAuction(BinaryReader reader)
     {
@@ -4009,7 +4102,7 @@ public class ClientQuestInfo
     public string Name, Group;
     public List<string> Description = new List<string>();
     public List<string> TaskDescription = new List<string>();
-    public List<string> CompletionDescription = new List<string>(); 
+    public List<string> CompletionDescription = new List<string>();
 
     public int MinLevelNeeded, MaxLevelNeeded;
     public int QuestNeeded;
@@ -4062,7 +4155,7 @@ public class ClientQuestInfo
 
         count = reader.ReadInt32();
 
-        for (int i = 0; i < count; i++ )
+        for (int i = 0; i < count; i++)
             RewardsFixedItem.Add(new QuestItemReward(reader));
 
         count = reader.ReadInt32();
@@ -4164,13 +4257,13 @@ public class ClientQuestProgress
 
     public QuestIcon Icon
     {
-        get 
+        get
         {
-            return QuestInfo.GetQuestIcon(Taken, Completed); 
+            return QuestInfo.GetQuestIcon(Taken, Completed);
         }
     }
 
-    public ClientQuestProgress(){ }
+    public ClientQuestProgress() { }
 
     public ClientQuestProgress(BinaryReader reader)
     {
@@ -4449,9 +4542,9 @@ public class IntelligentCreatureItemFilter
         }
         else
             if (!PetPickupGold && !PetPickupWeapons && !PetPickupArmours && !PetPickupHelmets && !PetPickupBoots && !PetPickupBelts && !PetPickupAccessories && !PetPickupOthers)
-            {
-                PetPickupAll = true;
-            }
+        {
+            PetPickupAll = true;
+        }
     }
 
     public IntelligentCreatureItemFilter(BinaryReader reader)
@@ -4815,7 +4908,7 @@ public abstract class Packet
                 return new C.CombineItem();
             case (short)ClientPacketIds.SetConcentration:
                 return new C.SetConcentration();
-			case (short)ClientPacketIds.AwakeningNeedMaterials:
+            case (short)ClientPacketIds.AwakeningNeedMaterials:
                 return new C.AwakeningNeedMaterials();
             case (short)ClientPacketIds.AwakeningLockedItem:
                 return new C.AwakeningLockedItem();
@@ -4932,7 +5025,7 @@ public abstract class Packet
             case (short)ServerPacketIds.StartGameBanned:
                 return new S.StartGameBanned();
             case (short)ServerPacketIds.StartGameDelay:
-                return new S.StartGameDelay();       
+                return new S.StartGameDelay();
             case (short)ServerPacketIds.MapInformation:
                 return new S.MapInformation();
             case (short)ServerPacketIds.UserInformation:
@@ -5077,7 +5170,7 @@ public abstract class Packet
                 return new S.NPCSell();
             case (short)ServerPacketIds.NPCRepair:
                 return new S.NPCRepair();
-            case (short)ServerPacketIds.NPCSRepair: 
+            case (short)ServerPacketIds.NPCSRepair:
                 return new S.NPCSRepair();
             case (short)ServerPacketIds.NPCRefine:
                 return new S.NPCRefine();
@@ -5285,7 +5378,7 @@ public abstract class Packet
                 return new S.SetBindingShot();
             case (short)ServerPacketIds.SendOutputMessage:
                 return new S.SendOutputMessage();
-			case (short)ServerPacketIds.NPCAwakening:
+            case (short)ServerPacketIds.NPCAwakening:
                 return new S.NPCAwakening();
             case (short)ServerPacketIds.NPCDisassemble:
                 return new S.NPCDisassemble();
@@ -5311,7 +5404,7 @@ public abstract class Packet
                 return new S.ParcelCollected();
             case (short)ServerPacketIds.MailCost:
                 return new S.MailCost();
-			case (short)ServerPacketIds.ResizeInventory:
+            case (short)ServerPacketIds.ResizeInventory:
                 return new S.ResizeInventory();
             case (short)ServerPacketIds.ResizeStorage:
                 return new S.ResizeStorage();
@@ -5603,7 +5696,7 @@ public class RandomItemStat
                 break;
             case ItemType.Ring:
                 SetRing();
-                break; 
+                break;
             case ItemType.Mount:
                 SetMount();
                 break;
@@ -5615,7 +5708,7 @@ public class RandomItemStat
         MaxDuraChance = 2;
         MaxDuraStatChance = 13;
         MaxDuraMaxStat = 13;
-        
+
         MaxDcChance = 15;
         MaxDcStatChance = 15;
         MaxDcMaxStat = 13;
@@ -5631,7 +5724,7 @@ public class RandomItemStat
         AttackSpeedChance = 60;
         AttackSpeedStatChance = 30;
         AttackSpeedMaxStat = 3;
-        
+
         StrongChance = 24;
         StrongStatChance = 20;
         StrongMaxStat = 2;
@@ -5901,14 +5994,14 @@ public class MineSet
         {
             case 1:
                 TotalSlots = 120;
-                Drops.Add(new MineDrop(){ItemName = "GoldOre", MinSlot = 1, MaxSlot = 2, MinDura = 3, MaxDura = 16, BonusChance = 20, MaxBonusDura = 10});
+                Drops.Add(new MineDrop() { ItemName = "GoldOre", MinSlot = 1, MaxSlot = 2, MinDura = 3, MaxDura = 16, BonusChance = 20, MaxBonusDura = 10 });
                 Drops.Add(new MineDrop() { ItemName = "SilverOre", MinSlot = 3, MaxSlot = 20, MinDura = 3, MaxDura = 16, BonusChance = 20, MaxBonusDura = 10 });
                 Drops.Add(new MineDrop() { ItemName = "CopperOre", MinSlot = 21, MaxSlot = 45, MinDura = 3, MaxDura = 16, BonusChance = 20, MaxBonusDura = 10 });
                 Drops.Add(new MineDrop() { ItemName = "BlackIronOre", MinSlot = 46, MaxSlot = 56, MinDura = 3, MaxDura = 16, BonusChance = 20, MaxBonusDura = 10 });
                 break;
             case 2:
                 TotalSlots = 100;
-                Drops.Add(new MineDrop(){ItemName = "PlatinumOre", MinSlot = 1, MaxSlot = 2, MinDura = 3, MaxDura = 16, BonusChance = 20, MaxBonusDura = 10});
+                Drops.Add(new MineDrop() { ItemName = "PlatinumOre", MinSlot = 1, MaxSlot = 2, MinDura = 3, MaxDura = 16, BonusChance = 20, MaxBonusDura = 10 });
                 Drops.Add(new MineDrop() { ItemName = "RubyOre", MinSlot = 3, MaxSlot = 20, MinDura = 3, MaxDura = 16, BonusChance = 20, MaxBonusDura = 10 });
                 Drops.Add(new MineDrop() { ItemName = "NephriteOre", MinSlot = 21, MaxSlot = 45, MinDura = 3, MaxDura = 16, BonusChance = 20, MaxBonusDura = 10 });
                 Drops.Add(new MineDrop() { ItemName = "AmethystOre", MinSlot = 46, MaxSlot = 56, MinDura = 3, MaxDura = 16, BonusChance = 20, MaxBonusDura = 10 });
@@ -5997,7 +6090,7 @@ public class Rank
     public string Name = "";
     public int Index = 0;
     public RankOptions Options = (RankOptions)0;
-    public Rank() 
+    public Rank()
     {
     }
     public Rank(BinaryReader reader, bool Offline = false)
@@ -6051,7 +6144,7 @@ public class GuildMember
     public bool Online;
 
     public GuildMember()
-    {}
+    { }
     public GuildMember(BinaryReader reader, bool Offline = false)
     {
         name = reader.ReadString();
@@ -6059,7 +6152,7 @@ public class GuildMember
         LastLogin = DateTime.FromBinary(reader.ReadInt64());
         hasvoted = reader.ReadBoolean();
         Online = reader.ReadBoolean();
-        Online = Offline ? false: Online;
+        Online = Offline ? false : Online;
     }
     public void save(BinaryWriter writer)
     {
@@ -6100,8 +6193,8 @@ public class GuildBuffInfo
     public byte BuffMc;
     public byte BuffSc;
     public byte BuffAttack;
-    public int  BuffMaxHp;
-    public int  BuffMaxMp;
+    public int BuffMaxHp;
+    public int BuffMaxMp;
     public byte BuffMineRate;
     public byte BuffGemRate;
     public byte BuffFishRate;
@@ -6110,7 +6203,7 @@ public class GuildBuffInfo
     public byte BuffSkillRate;
     public byte BuffHpRegen;
     public byte BuffMPRegen;
-    
+
     public byte BuffDropRate;
     public byte BuffGoldRate;
 
@@ -6150,31 +6243,31 @@ public class GuildBuffInfo
 
     public GuildBuffInfo(InIReader reader, int i)
     {
-        Id  = reader.ReadInt32("Buff-" + i.ToString(), "Id",0);
+        Id = reader.ReadInt32("Buff-" + i.ToString(), "Id", 0);
         Icon = reader.ReadInt32("Buff-" + i.ToString(), "Icon", 0);
-        name = reader.ReadString("Buff-" + i.ToString(), "Name","");
-        LevelRequirement = reader.ReadByte("Buff-" + i.ToString(), "LevelReq",0);
-        PointsRequirement = reader.ReadByte("Buff-" + i.ToString(), "PointsReq",1);
-        TimeLimit = reader.ReadInt32("Buff-" + i.ToString(), "TimeLimit",0);;
-        ActivationCost = reader.ReadInt32("Buff-" + i.ToString(), "ActivationCost",0);
-        BuffAc = reader.ReadByte("Buff-" + i.ToString(), "BuffAc",0);
-        BuffMac = reader.ReadByte("Buff-" + i.ToString(), "BuffMAC",0);
-        BuffDc = reader.ReadByte("Buff-" + i.ToString(), "BuffDc",0);
-        BuffMc = reader.ReadByte("Buff-" + i.ToString(), "BuffMc",0);
-        BuffSc = reader.ReadByte("Buff-" + i.ToString(), "BuffSc",0);
-        BuffMaxHp = reader.ReadInt32("Buff-" + i.ToString(), "BuffMaxHp",0);
-        BuffMaxMp = reader.ReadInt32("Buff-" + i.ToString(), "BuffMaxMp",0);
-        BuffMineRate = reader.ReadByte("Buff-" + i.ToString(), "BuffMineRate",0);
-        BuffGemRate = reader.ReadByte("Buff-" + i.ToString(), "BuffGemRate",0);
-        BuffFishRate = reader.ReadByte("Buff-" + i.ToString(), "BuffFishRate",0);
-        BuffExpRate = reader.ReadByte("Buff-" + i.ToString(), "BuffExpRate",0);
-        BuffCraftRate = reader.ReadByte("Buff-" + i.ToString(), "BuffCraftRate",0);
-        BuffSkillRate = reader.ReadByte("Buff-" + i.ToString(), "BuffSkillRate",0);
-        BuffHpRegen = reader.ReadByte("Buff-" + i.ToString(), "BuffHpRegen",0);
-        BuffMPRegen = reader.ReadByte("Buff-" + i.ToString(), "BuffMpRegen",0);
-        BuffAttack = reader.ReadByte("Buff-" + i.ToString(), "BuffAttack",0);
-        BuffDropRate = reader.ReadByte("Buff-" + i.ToString(), "BuffDropRate",0);
-        BuffGoldRate = reader.ReadByte("Buff-" + i.ToString(), "BuffGoldRate",0);
+        name = reader.ReadString("Buff-" + i.ToString(), "Name", "");
+        LevelRequirement = reader.ReadByte("Buff-" + i.ToString(), "LevelReq", 0);
+        PointsRequirement = reader.ReadByte("Buff-" + i.ToString(), "PointsReq", 1);
+        TimeLimit = reader.ReadInt32("Buff-" + i.ToString(), "TimeLimit", 0); ;
+        ActivationCost = reader.ReadInt32("Buff-" + i.ToString(), "ActivationCost", 0);
+        BuffAc = reader.ReadByte("Buff-" + i.ToString(), "BuffAc", 0);
+        BuffMac = reader.ReadByte("Buff-" + i.ToString(), "BuffMAC", 0);
+        BuffDc = reader.ReadByte("Buff-" + i.ToString(), "BuffDc", 0);
+        BuffMc = reader.ReadByte("Buff-" + i.ToString(), "BuffMc", 0);
+        BuffSc = reader.ReadByte("Buff-" + i.ToString(), "BuffSc", 0);
+        BuffMaxHp = reader.ReadInt32("Buff-" + i.ToString(), "BuffMaxHp", 0);
+        BuffMaxMp = reader.ReadInt32("Buff-" + i.ToString(), "BuffMaxMp", 0);
+        BuffMineRate = reader.ReadByte("Buff-" + i.ToString(), "BuffMineRate", 0);
+        BuffGemRate = reader.ReadByte("Buff-" + i.ToString(), "BuffGemRate", 0);
+        BuffFishRate = reader.ReadByte("Buff-" + i.ToString(), "BuffFishRate", 0);
+        BuffExpRate = reader.ReadByte("Buff-" + i.ToString(), "BuffExpRate", 0);
+        BuffCraftRate = reader.ReadByte("Buff-" + i.ToString(), "BuffCraftRate", 0);
+        BuffSkillRate = reader.ReadByte("Buff-" + i.ToString(), "BuffSkillRate", 0);
+        BuffHpRegen = reader.ReadByte("Buff-" + i.ToString(), "BuffHpRegen", 0);
+        BuffMPRegen = reader.ReadByte("Buff-" + i.ToString(), "BuffMpRegen", 0);
+        BuffAttack = reader.ReadByte("Buff-" + i.ToString(), "BuffAttack", 0);
+        BuffDropRate = reader.ReadByte("Buff-" + i.ToString(), "BuffDropRate", 0);
+        BuffGoldRate = reader.ReadByte("Buff-" + i.ToString(), "BuffGoldRate", 0);
     }
 
     public void Save(InIReader reader, int i)
@@ -6389,7 +6482,7 @@ public class GuildBuff
 
         return answer;
     }
-    
+
     public string ShowStats()
     {
         if (Info == null) return "";

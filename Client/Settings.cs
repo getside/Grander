@@ -39,8 +39,8 @@ namespace Client
                             NPCPath = @".\Data\NPC\",
                             CArmourPath = @".\Data\CArmour\",
                             CWeaponPath = @".\Data\CWeapon\",
-							CWeaponEffectPath = @".\Data\CWeaponEffect\",
-							CHairPath = @".\Data\CHair\",
+                            CWeaponEffectPath = @".\Data\CWeaponEffect\",
+                            CHairPath = @".\Data\CHair\",
                             AArmourPath = @".\Data\AArmour\",
                             AWeaponPath = @".\Data\AWeapon\",
                             AHairPath = @".\Data\AHair\",
@@ -56,7 +56,47 @@ namespace Client
                             TransformPath = @".\Data\Transform\",
                             TransformMountsPath = @".\Data\TransformRide2\",
                             TransformEffectPath = @".\Data\TransformEffect\",
-                            TransformWeaponEffectPath = @".\Data\TransformWeaponEffect\";
+                            TransformWeaponEffectPath = @".\Data\TransformWeaponEffect\",
+
+                             //stupple HUMUP stared
+                             UpCArmourPath = @".\Data\HumUp\UpCArmour\",
+                             UpCWeaponPath = @".\Data\HumUp\UpCWeapon\",
+                             UpCHairPath = @".\Data\HumUp\UpCHair\",
+                             UpCHumEffectPath = @".\Data\HumUp\UpCHumEffect\",
+
+                             UpWarArmourPath = @".\Data\HumUp\UpWarArmour\",
+                             UpWarWeaponPath = @".\Data\HumUp\UpWarWeapon\",
+                             UpWarHairPath = @".\Data\HumUp\UpWarHair\",
+                             UpWarHumEffectPath = @".\Data\HumUp\UpWarHumEffect\",
+
+                             UpWizArmourPath = @".\Data\HumUp\UpWizArmour\",
+                             UpWizWeaponPath = @".\Data\HumUp\UpWizWeapon\",
+                             UpWizHairPath = @".\Data\HumUp\UpWizHair\",
+                             UpWizHumEffectPath = @".\Data\HumUp\UpWizHumEffect\",
+
+                             UpTaoArmourPath = @".\Data\HumUp\UpTaoArmour\",
+                             UpTaoWeaponPath = @".\Data\HumUp\UpTaoWeapon\",
+                             UpTaoHairPath = @".\Data\HumUp\UpTaoHair\",
+                             UpTaoHumEffectPath = @".\Data\HumUp\UpTaoHumEffect\",
+
+                             UpAssArmourPath = @".\Data\HumUp\UpAssArmour\",
+                             UpAssWeaponRPath = @".\Data\HumUp\UpAssWeaponR\",
+                             UpAssWeaponLPath = @".\Data\HumUp\UpAssWeaponL\",
+                             UpAssHairPath = @".\Data\HumUp\UpAssHair\",
+                             UpAssHumEffectPath = @".\Data\HumUp\UpAssHumEffect\",
+
+                             UpArcArmourPath = @".\Data\HumUp\UpArcArmour\",
+                             UpArcWeaponPath = @".\Data\HumUp\UpArcWeapon\",
+                             UpArcWeaponSPath = @".\Data\HumUp\UpArcWeaponS\",
+                             UpArcHairPath = @".\Data\HumUp\UpArcHair\",
+                             UpArcHumEffectPath = @".\Data\HumUp\UpArcHumEffect\",
+
+
+                             UpMountPath = @".\Data\HumUp\UpMount\",
+                             UpFishingPath = @".\Data\HumUp\UpFishing\";
+                            //STupple Humup end
+
+
 
         //Logs
         public static bool LogErrors = true;

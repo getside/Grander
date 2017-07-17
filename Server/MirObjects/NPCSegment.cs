@@ -2902,6 +2902,21 @@ namespace Server.MirObjects
                             case MirClass.Archer:
                                 player.Info.Class = MirClass.Archer;
                                 break;
+                            case MirClass.HighWarrior://stupple
+                                player.Info.Class = MirClass.HighWarrior;
+                                break;
+                            case MirClass.HighTaoist:
+                                player.Info.Class = MirClass.HighTaoist;
+                                break;
+                            case MirClass.HighWizard:
+                                player.Info.Class = MirClass.HighWizard;
+                                break;
+                            case MirClass.HighAssassin:
+                                player.Info.Class = MirClass.HighAssassin;
+                                break;
+                            case MirClass.HighArcher:
+                                player.Info.Class = MirClass.HighArcher;
+                                break;
                         }
                         break;
 
@@ -3491,6 +3506,10 @@ namespace Server.MirObjects
                         if (CloseGate == null) return;
                         if (CloseGate.Gate == null) return;
                         CloseGate.Gate.CloseDoor();
+                        break;
+
+                    case ActionType.Humup:
+                        player.Humup();
                         break;
                 }
             }

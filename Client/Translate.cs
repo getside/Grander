@@ -47,68 +47,62 @@ namespace Client
     {
         public override string UserInterface(int Code)
         {
-            string result = null;
             switch (Code)
             {
-                case 0: result = null; break;
+                case 0: return null;
             }
 
-            return result;
+            return null;
         }
 
         public override string Map(int Code)
         {
-            string result = null;
             switch (Code)
             {
-                case 0: result = null; break;
+                case 0: return null;
             }
 
-            return result;
+            return null;
         }
 
         public override string Item(int Code)
         {
-            string result = null;
             switch (Code)
             {
-                case 0: result = null; break;
+                case 0: return null;
             }
 
-            return result;
+            return null;
         }
 
         public override string Monster(int Code)
         {
-            string result = null;
             switch (Code)
             {
-                case 0: result = null; break;
+                case 0: return null;
             }
 
-            return result;
+            return null;
         }
 
         public override string NPC(int Code)
         {
-            string result = null;
             switch (Code)
             {
-                case 0: result = null; break;
+                case 0: return null;
             }
 
-            return result;
+            return null;
         }
 
         public override string Skill(int Code)
         {
-            string result = null;
             switch (Code)
             {
-                case 0: result = null; break;
+                case 0: return null;
             }
 
-            return result;
+            return null;
         }
     }
 

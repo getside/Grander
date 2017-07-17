@@ -80,6 +80,7 @@ namespace Server.MirDatabase
             writer.Write(Need2);
             writer.Write(Need3);
             writer.Write(Need4);
+            writer.Write(HumUpTrain);
             writer.Write(DelayBase);
             writer.Write(DelayReduction);
             writer.Write(PowerBase);

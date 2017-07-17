@@ -120,6 +120,10 @@ namespace Client.MirScenes
 
         public BuffDialog BuffsDialog;
 
+        public TransformImageDialog TransformImageDialog; //stupple
+        public TransformBackDialog TransformBackDialog;  //stupple
+        public HumupTransformDialog HumupTransformDialog; //stupple
+
         //not added yet
         public KeyboardLayoutDialog KeyboardLayoutDialog;
 
@@ -262,6 +266,10 @@ namespace Client.MirScenes
             ItemRentalDialog = new ItemRentalDialog { Parent = this, Visible = false };
 
             BuffsDialog = new BuffDialog {Parent = this, Visible = true};
+
+            TransformImageDialog = new TransformImageDialog { Parent = this, Visible = false }; //stupple
+            TransformBackDialog = new TransformBackDialog { Parent = this, Visible = false };//stupple
+            HumupTransformDialog = new HumupTransformDialog { Parent = this, Visible = true };//stupple
 
             //not added yet
             KeyboardLayoutDialog = new KeyboardLayoutDialog { Parent = this, Visible = false };
@@ -480,6 +488,10 @@ namespace Client.MirScenes
                         MailListDialog.Hide();
                         MailReadLetterDialog.Hide();
                         MailReadParcelDialog.Hide();
+
+                        TransformImageDialog.Hide(); //stupple
+                        TransformBackDialog.Hide(); //stupple
+                        HumupTransformDialog.Hide();//stupple
                         ItemRentalDialog.Visible = false;
 
 
@@ -677,7 +689,7 @@ namespace Client.MirScenes
         {
             if (User.RidingMount || User.Fishing) return;
 
-            if(!User.HasClassWeapon && User.Weapon >= 0)
+            if (!Functions.EqualClass(User.Equipment[(int)EquipmentSlot.Weapon].RequiredClass, User.Class) && User.Weapon >= 0)//stupple
             {
                 ChatDialog.ReceiveChat("You must be wearing a suitable weapon to perform this skill", ChatType.System);
                 return;
@@ -1666,6 +1678,13 @@ namespace Client.MirScenes
                 case (short)ServerPacketIds.ConfirmItemRental:
                     ConfirmItemRental((S.ConfirmItemRental)p);
                     break;
+
+                case (short)ServerPacketIds.HumUpPlayer://stupple
+                    HumUpPlayer((S.HumUpPlayer)p);
+                    break;
+                case (short)ServerPacketIds.NPCTransform://stupple
+                    NPCTransform((S.NPCTransform)p);
+                    break;
                 default:
                     base.ProcessPacket(p);
                     break;
@@ -1687,7 +1706,7 @@ namespace Client.MirScenes
         }
         private void UserInformation(S.UserInformation p)
         {
-            User = new UserObject(p.ObjectID);
+            User = new UserObject(p.ObjectID, p.Class);//stupple
             User.Load(p);
             MainDialog.PModeLabel.Visible = User.Class == MirClass.Wizard || User.Class == MirClass.Taoist;
             Gold = p.Gold;
@@ -1734,7 +1753,7 @@ namespace Client.MirScenes
         }
         private void ObjectPlayer(S.ObjectPlayer p)
         {
-            PlayerObject player = new PlayerObject(p.ObjectID);
+            PlayerObject player = new PlayerObject(p.ObjectID, p.Class);//stupple
             player.Load(p);
         }
         private void ObjectRemove(S.ObjectRemove p)
@@ -3096,6 +3115,9 @@ namespace Client.MirScenes
             // BuyBackDialog.Hide();
             NPCDropDialog.Hide();
             StorageDialog.Hide();
+            TransformImageDialog.Hide(); //stupple
+            TransformBackDialog.Hide();//stupple
+            HumupTransformDialog.Hide();//stupple
         }
         private void NPCUpdate(S.NPCUpdate p)
         {
@@ -3749,6 +3771,11 @@ namespace Client.MirScenes
                             ef.Played += (o, e) => SoundManager.PlaySound(50000);
                             ob.Effects.Add(ef);
                             ob.Effects.Add(new Effect(Libraries.Magic3, 830, 5, 500, ob, CMain.Time + p.DelayTime) { Blend = false });
+                        }
+                        break;
+                    case SpellEffect.HumUpEffect://stupple
+                        {
+                            ob.Effects.Add(new Effect(Libraries.Effect, 760, 94, 9400, ob));
                         }
                         break;
                     case SpellEffect.TurtleKing:
@@ -5161,6 +5188,28 @@ namespace Client.MirScenes
                     break;
                 case 1:
                     GameScene.Scene.MailReadParcelDialog.Hide();
+                    break;
+            }
+        }
+
+        private void HumUpPlayer(S.HumUpPlayer p)//stupple
+        {
+            PlayerObject player = (PlayerObject)GameScene.Scene.MapControl.FindObject(p.ObjectID, p.Location.X, p.Location.Y);
+            player.Class = p.Class;
+        }
+
+        private void NPCTransform(S.NPCTransform p)//stupple
+        {
+            switch (p.Type)
+            {
+                case 0:
+                    TransformImageDialog.Show();
+                    break;
+                case 1:
+                    TransformBackDialog.Show();
+                    break;
+                case 2:
+                    HumupTransformDialog.Show();
                     break;
             }
         }
@@ -6959,6 +7008,35 @@ namespace Client.MirScenes
                 ItemLabel.Size = new Size(Math.Max(ItemLabel.Size.Width, CLASSLabel.DisplayRectangle.Right + 4),
                     Math.Max(ItemLabel.Size.Height, CLASSLabel.DisplayRectangle.Bottom));
             }
+
+            #endregion
+
+            #region CLASS //stupple all
+            if (item.RequiredClass != RequiredClass.None)
+            {
+                count++;
+                Color colour = Color.White;
+
+                if (!Functions.EqualClass(item.RequiredClass, MapObject.User.Class))
+                {
+                    colour = Color.Red;
+                }
+
+                MirLabel CLASSLabel = new MirLabel
+                {
+                    AutoSize = true,
+                    ForeColour = colour,
+                    Location = new Point(4, ItemLabel.DisplayRectangle.Bottom),
+                    OutLine = true,
+                    OutLineColour = Color.FromArgb(255, 70, 70, 70),
+                    Parent = ItemLabel,
+                    Text = string.Format("Class Required : {0}", realItem.RequiredClass)
+                };
+
+                ItemLabel.Size = new Size(Math.Max(ItemLabel.Size.Width, CLASSLabel.DisplayRectangle.Right + 4),
+                    Math.Max(ItemLabel.Size.Height, CLASSLabel.DisplayRectangle.Bottom));
+            }
+
 
             #endregion
 
@@ -9271,7 +9349,7 @@ namespace Client.MirScenes
 
                     GameScene.LogTime = CMain.Time + Globals.LogDelay;
 
-                    if (User.Class == MirClass.Archer && User.HasClassWeapon && !User.RidingMount && !User.Fishing)//ArcherTest - non aggressive targets (player / pets)
+                    if ((User.Class == MirClass.Archer || User.Class == MirClass.HighArcher) && User.HasClassWeapon && !User.RidingMount && !User.Fishing)//ArcherTest - non aggressive targets (player / pets)//stupple
                     {
                         if (Functions.InRange(MapObject.TargetObject.CurrentLocation, User.CurrentLocation, Globals.MaxAttackRange))
                         {
@@ -9367,7 +9445,7 @@ namespace Client.MirScenes
                                 MapObject target = null;
                                 if (MapObject.MouseObject is MonsterObject || MapObject.MouseObject is PlayerObject) target = MapObject.MouseObject;
 
-                                if (User.Class == MirClass.Archer && User.HasClassWeapon && !User.RidingMount)
+                                if (User.Class == MirClass.Archer || User.Class == MirClass.HighArcher && User.HasClassWeapon && !User.RidingMount) //stupple
                                 {
                                     if (target != null)
                                     {
@@ -9396,7 +9474,7 @@ namespace Client.MirScenes
                             return;
                         }
 
-                        if (MapObject.MouseObject is MonsterObject && User.Class == MirClass.Archer && MapObject.TargetObject != null && !MapObject.TargetObject.Dead && User.HasClassWeapon && !User.RidingMount) //ArcherTest - range attack
+                        if (MapObject.MouseObject is MonsterObject && User.Class == MirClass.Archer || User.Class == MirClass.HighArcher && MapObject.TargetObject != null && !MapObject.TargetObject.Dead && User.HasClassWeapon && !User.RidingMount) //ArcherTest - range attack //stupple
                         {
                             if (Functions.InRange(MapObject.MouseObject.CurrentLocation, User.CurrentLocation, Globals.MaxAttackRange))
                             {
@@ -9509,7 +9587,8 @@ namespace Client.MirScenes
             if (((!MapObject.TargetObject.Name.EndsWith(")") && !(MapObject.TargetObject is PlayerObject)) || !CMain.Shift) &&
                 (MapObject.TargetObject.Name.EndsWith(")") || !(MapObject.TargetObject is MonsterObject))) return;
             if (Functions.InRange(MapObject.TargetObject.CurrentLocation, User.CurrentLocation, 1)) return;
-            if (User.Class == MirClass.Archer && User.HasClassWeapon && (MapObject.TargetObject is MonsterObject || MapObject.TargetObject is PlayerObject)) return; //ArcherTest - stop walking
+            //if (User.Class == MirClass.Archer || User.Class == MirClass.HighArcher && User.HasClassWeapon && (MapObject.TargetObject is MonsterObject || MapObject.TargetObject is PlayerObject)) return; //ArcherTest - stop walking //stupple
+            if ((User.Class == MirClass.Archer || User.Class == MirClass.HighArcher) && User.HasClassWeapon && (MapObject.TargetObject is MonsterObject || MapObject.TargetObject is PlayerObject)) return; //ArcherTest - stop walking //stupple
             direction = Functions.DirectionFromPoint(User.CurrentLocation, MapObject.TargetObject.CurrentLocation);
 
             if (!CanWalk(direction)) return;
@@ -10250,6 +10329,10 @@ namespace Client.MirScenes
                     break;
                 case BuffType.Knapsack:
                     text = string.Format("Knapsack\nIncreases BagWeight by: {0}.\n", Values[0]);
+                    break;
+
+                case BuffType.HumUp://stupple
+                    text = string.Format("Humup\n");
                     break;
             }
 

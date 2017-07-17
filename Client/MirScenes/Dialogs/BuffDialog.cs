@@ -592,6 +592,9 @@ namespace Client.MirScenes.Dialogs
                     return 158;
                 case BuffType.WonderDrug:
                     return 252;
+
+                case BuffType.HumUp://stupple
+                    return 508;//508
                 default:
                     return 0;
             }

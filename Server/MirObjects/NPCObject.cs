@@ -55,7 +55,7 @@ namespace Server.MirObjects
 
             TransformKey = "[@TRANSFORM]",
             TransformBackKey = "[@TRANSFORMBACK]",
-            HumupTransformKey = "[@HUMUPTRANSFORM]",
+            HumupTransformKey = "[@HUMUPTRANSFORM]";
 
 
         //public static Regex Regex = new Regex(@"[^\{\}]<.*?/(.*?)>");
@@ -1501,6 +1501,8 @@ namespace Server.MirObjects
         AddGuildNameList,
         DelGuildNameList,
         ClearGuildNameList,
+
+        Humup,
     }
     public enum CheckType
     {

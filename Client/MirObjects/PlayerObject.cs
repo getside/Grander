@@ -54,6 +54,16 @@ namespace Client.MirObjects
                         return Class == MirClass.Assassin;
                     case 2:
                         return Class == MirClass.Archer;
+                    case 3://stupple
+                        return Class == MirClass.HighWarrior;
+                    case 4:
+                        return Class == MirClass.HighWizard;
+                    case 5:
+                        return Class == MirClass.HighTaoist;
+                    case 6:
+                        return Class == MirClass.HighAssassin;
+                    case 7:
+                        return Class == MirClass.HighArcher;
                 }
             }
         }
@@ -109,10 +119,14 @@ namespace Client.MirObjects
 
         public LevelEffects LevelEffects;
 
-        public PlayerObject(uint objectID)
+        public PlayerObject(uint objectID, MirClass Class)
             : base(objectID)
         {
             Frames = FrameSet.Players;
+            if ((byte)Class < 5)
+                Frames = FrameSet.Players;
+            else
+                Frames = FrameSet.HighPlayers[0];
         }
 
         public void Load(S.ObjectPlayer info)
@@ -217,7 +231,7 @@ namespace Client.MirObjects
                 MirDirection dir = Functions.DirectionFromPoint(CurrentLocation, p.FishingPoint);
 
                 if (p.Fishing)
-                {        
+                {
                     QueuedAction action = new QueuedAction { Action = MirAction.FishingCast, Direction = dir, Location = CurrentLocation };
                     ActionFeed.Add(action);
                 }
@@ -225,427 +239,1310 @@ namespace Client.MirObjects
                 {
                     QueuedAction action = new QueuedAction { Action = MirAction.FishingReel, Direction = dir, Location = CurrentLocation };
                     ActionFeed.Add(action);
+
+                    if (p.FoundFish)
+                        GameScene.Scene.ChatDialog.ReceiveChat("Found fish!!", ChatType.Hint);
                 }
 
                 Fishing = p.Fishing;
                 SetLibraries();
             }
-
+            
             if (!HasFishingRod)
             {
                 GameScene.Scene.FishingDialog.Hide();
-            }          
+            }
 
             FishingPoint = p.FishingPoint;
             FoundFish = p.FoundFish;
         }
 
+        private void ResetFramePos(bool AltAnim, int idx) //stupple
+        {
+            FrameSet tempFrames = Frames;
+            Frames = AltAnim ? FrameSet.HighPlayers[idx] : FrameSet.HighPlayers[0];
+
+            if (tempFrames != Frames)
+            {
+                DrawFrame = 0;
+                DrawWingFrame = 0;
+                FrameIndex = 0;
+                EffectFrameIndex = 0;
+                Frame = Frames.Frames[CurrentAction];
+            }
+        }
 
         public virtual void SetLibraries()
         {
-            //fishing broken
-            //10
-            //11
-            //12
-            //13
+            bool AltAnim = false;
 
-            //almost all broken
-            //20 - black footballer - 791
-            //21 - red footballer - 791
-            //22 - blue footballer - 791
-            //23 - green footballer - 791
-            //24 - red2 footballer - 791
-
-            bool altAnim = false;
-
-            bool showMount = true;
-            bool showFishing = true;
-
-            if (TransformType > -1)
+            switch (Class)
             {
-                #region Transform
-                
-                switch (TransformType)
-                {
-                    case 4:
-                    case 5:
-                    case 7:
-                    case 8:                
-                    case 26:
-                        showFishing = false;
-                        break;
-                    case 6:
-                    case 9:
-                        showMount = false;
-                        showFishing = false;
-                        break;
-                    default:
-                        break;
-                }
+                #region Archer
+                case MirClass.Archer:
 
-                switch (CurrentAction)
-                {
-                    case MirAction.Standing:
-                    case MirAction.Jump:
-                        Frames.Frames.TryGetValue(MirAction.Standing, out Frame);
-                        break;
-                    case MirAction.Walking:
-                    case MirAction.WalkingBow:
-                        Frames.Frames.TryGetValue(MirAction.Walking, out Frame);
-                        break;
-                    case MirAction.Running:
-                    case MirAction.RunningBow:
-                        Frames.Frames.TryGetValue(MirAction.Running, out Frame);
-                        break;
-                    case MirAction.Attack1:
-                    case MirAction.Attack2:
-                    case MirAction.Attack3:
-                    case MirAction.Attack4:
-                    case MirAction.AttackRange1:
-                    case MirAction.AttackRange2:
-                    case MirAction.AttackRange3:
-                        Frames.Frames.TryGetValue(MirAction.Attack1, out Frame);
-                        break;
-                }
-
-                if (MountType > 6 && RidingMount)
-                {
-                    ArmourOffSet = -416;
-                    BodyLibrary = TransformType < Libraries.TransformMounts.Length ? Libraries.TransformMounts[TransformType] : Libraries.TransformMounts[0];
-                }
-                else
-                {
-                    ArmourOffSet = 0;
-                    BodyLibrary = TransformType < Libraries.Transform.Length ? Libraries.Transform[TransformType] : Libraries.Transform[0];
-                }
-
-                HairLibrary = null;
-                WeaponLibrary1 = null;
-                WeaponLibrary2 = null;
-
-                if (TransformType == 19)
-                {
-                    WingEffect = 2;
-                    WingLibrary = WingEffect - 1 < Libraries.TransformEffect.Length ? Libraries.TransformEffect[WingEffect - 1] : null;
-                }
-                else
-                {
-                    WingLibrary = null;
-                }
-
-                HairOffSet = 0;
-                WeaponOffSet = 0;
-                WingOffset = 0;
-                MountOffset = 0;
-
-                #endregion
-            }
-            else
-            {
-
-                switch (Class)
-                {
-                    #region Archer
-                    case MirClass.Archer:
-
-                        #region WeaponType
-                        if (HasClassWeapon)
+                    #region WeaponType
+                    if (HasClassWeapon)
+                    {
+                        switch (CurrentAction)
                         {
-                            switch (CurrentAction)
-                            {
-                                case MirAction.Walking:
-                                case MirAction.Running:
-                                case MirAction.AttackRange1:
-                                case MirAction.AttackRange2:
-                                    altAnim = true;
-                                    break;
-                            }
+                            case MirAction.Walking:
+                            case MirAction.Running:
+                            case MirAction.AttackRange1:
+                            case MirAction.AttackRange2:
+                                AltAnim = true;
+                                break;
                         }
+                    }
 
-                        if (CurrentAction == MirAction.Jump) altAnim = true;
+                    if (CurrentAction == MirAction.Jump) AltAnim = true;
 
-                        #endregion
-
-                        #region Armours
-                        if (altAnim)
-                        {
-                            switch (Armour)
-                            {
-                                case 9: //heaven
-                                case 10: //mir
-                                case 11: //oma
-                                case 12: //spirit
-                                    BodyLibrary = Armour + 1 < Libraries.ARArmours.Length ? Libraries.ARArmours[Armour + 1] : Libraries.ARArmours[0];
-                                    break;
-
-                                case 19:
-                                    BodyLibrary = Armour - 5 < Libraries.ARArmours.Length ? Libraries.ARArmours[Armour - 5] : Libraries.ARArmours[0];
-                                    break;
-
-                                case 29:
-                                case 30:
-                                    BodyLibrary = Armour - 14 < Libraries.ARArmours.Length ? Libraries.ARArmours[Armour - 14] : Libraries.ARArmours[0];
-                                    break;
-
-                                case 35:
-                                case 36:
-                                case 37:
-                                case 38:
-                                case 39:
-                                case 40:
-                                case 41:
-                                    BodyLibrary = Armour - 32 < Libraries.ARArmours.Length ? Libraries.ARArmours[Armour - 32] : Libraries.ARArmours[0];
-                                    break;
-
-                                default:
-                                    BodyLibrary = Armour < Libraries.ARArmours.Length ? Libraries.ARArmours[Armour] : Libraries.ARArmours[0];
-                                    break;
-                            }
-
-                            HairLibrary = Hair < Libraries.ARHair.Length ? Libraries.ARHair[Hair] : null;
-                        }
-                        else
-                        {
-                            BodyLibrary = Armour < Libraries.CArmours.Length ? Libraries.CArmours[Armour] : Libraries.CArmours[0];
-                            HairLibrary = Hair < Libraries.CHair.Length ? Libraries.CHair[Hair] : null;
-                        }
-                        #endregion
-
-                        #region Weapons
-                        if (HasClassWeapon)
-                        {
-                            int Index = Weapon - 200;
-
-                            if (altAnim)
-                                WeaponLibrary2 = Index < Libraries.ARWeaponsS.Length ? Libraries.ARWeaponsS[Index] : null;
-                            else
-                                WeaponLibrary2 = Index < Libraries.ARWeapons.Length ? Libraries.ARWeapons[Index] : null;
-
-                            WeaponLibrary1 = null;
-                        }
-                        else
-                        {
-							if (Weapon >= 0)
-							{
-								WeaponLibrary1 = Weapon < Libraries.CWeapons.Length ? Libraries.CWeapons[Weapon] : null;
-								if (WeaponEffect > 0)
-									WeaponEffectLibrary1 = WeaponEffect < Libraries.CWeaponEffect.Length ? Libraries.CWeaponEffect[WeaponEffect] : null;
-								else
-									WeaponEffectLibrary1 = null;
-							}
-							else
-							{
-								WeaponLibrary1 = null;
-								WeaponEffectLibrary1 = null;
-								WeaponLibrary2 = null;
-							}
-						}
-                        #endregion
-
-                        #region WingEffects
-                        if (WingEffect > 0 && WingEffect < 100)
-                        {
-                            if (altAnim)
-                                WingLibrary = (WingEffect - 1) < Libraries.ARHumEffect.Length ? Libraries.ARHumEffect[WingEffect - 1] : null;
-                            else
-                                WingLibrary = (WingEffect - 1) < Libraries.CHumEffect.Length ? Libraries.CHumEffect[WingEffect - 1] : null;
-                        }
-                        #endregion
-
-                        #region Offsets
-                        ArmourOffSet = Gender == MirGender.Male ? 0 : altAnim ? 352 : 808;
-                        HairOffSet = Gender == MirGender.Male ? 0 : altAnim ? 352 : 808;
-                        WeaponOffSet = Gender == MirGender.Male ? 0 : altAnim ? 352 : 416;
-                        WingOffset = Gender == MirGender.Male ? 0 : altAnim ? 352 : 840;
-                        MountOffset = 0;
-                        #endregion
-
-                        break;
                     #endregion
 
-
-                    #region Assassin
-                    case MirClass.Assassin:
-
-                        #region WeaponType
-                        if (HasClassWeapon || Weapon < 0)
+                    #region Armours
+                    if (AltAnim)
+                    {
+                        switch (Armour)
                         {
-                            switch (CurrentAction)
-                            {
-                                case MirAction.Standing:
-                                case MirAction.Stance:
-                                case MirAction.Walking:
-                                case MirAction.Running:
-                                case MirAction.Die:
-                                case MirAction.Struck:
-                                case MirAction.Attack1:
-                                case MirAction.Attack2:
-                                case MirAction.Attack3:
-                                case MirAction.Attack4:
-                                case MirAction.Sneek:
-                                case MirAction.Spell:
-                                case MirAction.DashAttack:
-                                    altAnim = true;
-                                    break;
-                            }
+                            case 9: //heaven
+                            case 10: //mir
+                            case 11: //oma
+                            case 12: //spirit
+                                BodyLibrary = Armour + 1 < Libraries.ARArmours.Length ? Libraries.ARArmours[Armour + 1] : Libraries.ARArmours[0];
+                                break;
+
+                            case 19:
+                                BodyLibrary = Armour - 5 < Libraries.ARArmours.Length ? Libraries.ARArmours[Armour - 5] : Libraries.ARArmours[0];
+                                break;
+
+                            case 29:
+                            case 30:
+                                BodyLibrary = Armour - 14 < Libraries.ARArmours.Length ? Libraries.ARArmours[Armour - 14] : Libraries.ARArmours[0];
+                                break;
+
+                            case 35:
+                            case 36:
+                            case 37:
+                            case 38:
+                            case 39:
+                            case 40:
+                            case 41:
+                                BodyLibrary = Armour - 32 < Libraries.ARArmours.Length ? Libraries.ARArmours[Armour - 32] : Libraries.ARArmours[0];
+                                break;
+
+                            default:
+                                BodyLibrary = Armour < Libraries.ARArmours.Length ? Libraries.ARArmours[Armour] : Libraries.ARArmours[0];
+                                break;
                         }
-                        #endregion
 
-                        #region Armours
-                        if (altAnim)
-                        {
-                            switch (Armour)
-                            {
-                                case 9: //heaven
-                                case 10: //mir
-                                case 11: //oma
-                                case 12: //spirit
-                                    BodyLibrary = Armour + 3 < Libraries.AArmours.Length ? Libraries.AArmours[Armour + 3] : Libraries.AArmours[0];
-                                    break;
-
-                                case 19:
-                                    BodyLibrary = Armour - 3 < Libraries.AArmours.Length ? Libraries.AArmours[Armour - 3] : Libraries.AArmours[0];
-                                    break;
-
-                                case 20:
-                                case 21:
-                                case 22:
-                                case 23: //red bone
-                                case 24:
-                                    BodyLibrary = Armour - 17 < Libraries.AArmours.Length ? Libraries.AArmours[Armour - 17] : Libraries.AArmours[0];
-                                    break;
-
-                                case 28:
-                                case 29:
-                                case 30:
-                                    BodyLibrary = Armour - 20 < Libraries.AArmours.Length ? Libraries.AArmours[Armour - 20] : Libraries.AArmours[0];
-                                    break;
-
-                                case 34:
-                                    BodyLibrary = Armour - 23 < Libraries.AArmours.Length ? Libraries.AArmours[Armour - 23] : Libraries.AArmours[0];
-                                    break;
-
-                                default:
-                                    BodyLibrary = Armour < Libraries.AArmours.Length ? Libraries.AArmours[Armour] : Libraries.AArmours[0];
-                                    break;
-                            }
-
-                            HairLibrary = Hair < Libraries.AHair.Length ? Libraries.AHair[Hair] : null;
-                        }
-                        else
-                        {
-                            BodyLibrary = Armour < Libraries.CArmours.Length ? Libraries.CArmours[Armour] : Libraries.CArmours[0];
-                            HairLibrary = Hair < Libraries.CHair.Length ? Libraries.CHair[Hair] : null;
-                        }
-                        #endregion
-
-                        #region Weapons
-                        if (HasClassWeapon)
-                        {
-                            int Index = Weapon - 100;
-
-                            WeaponLibrary1 = Index < Libraries.AWeaponsL.Length ? Libraries.AWeaponsR[Index] : null;
-                            WeaponLibrary2 = Index < Libraries.AWeaponsR.Length ? Libraries.AWeaponsL[Index] : null;
-                        }
-                        else
-                        {
-							if (Weapon >= 0)
-							{
-								WeaponLibrary1 = Weapon < Libraries.CWeapons.Length ? Libraries.CWeapons[Weapon] : null;
-								if (WeaponEffect > 0)
-									WeaponEffectLibrary1 = WeaponEffect < Libraries.CWeaponEffect.Length ? Libraries.CWeaponEffect[WeaponEffect] : null;
-								else
-									WeaponEffectLibrary1 = null;
-							}
-							else
-							{
-								WeaponLibrary1 = null;
-								WeaponEffectLibrary1 = null;
-								WeaponLibrary2 = null;
-							}
-						}
-                        #endregion
-
-                        #region WingEffects
-                        if (WingEffect > 0 && WingEffect < 100)
-                        {
-                            if (altAnim)
-                                WingLibrary = (WingEffect - 1) < Libraries.AHumEffect.Length ? Libraries.AHumEffect[WingEffect - 1] : null;
-                            else
-                                WingLibrary = (WingEffect - 1) < Libraries.CHumEffect.Length ? Libraries.CHumEffect[WingEffect - 1] : null;
-                        }
-                        #endregion
-
-                        #region Offsets
-                        ArmourOffSet = Gender == MirGender.Male ? 0 : altAnim ? 512 : 808;
-                        HairOffSet = Gender == MirGender.Male ? 0 : altAnim ? 512 : 808;
-                        WeaponOffSet = Gender == MirGender.Male ? 0 : altAnim ? 512 : 416;
-                        WingOffset = Gender == MirGender.Male ? 0 : altAnim ? 544 : 840;
-                        MountOffset = 0;
-                        #endregion
-
-                        break;
-                    #endregion
-
-
-                    #region Others
-                    case MirClass.Warrior:
-                    case MirClass.Taoist:
-                    case MirClass.Wizard:
-
-                        #region Armours
+                        HairLibrary = Hair < Libraries.ARHair.Length ? Libraries.ARHair[Hair] : null;
+                    }
+                    else
+                    {
                         BodyLibrary = Armour < Libraries.CArmours.Length ? Libraries.CArmours[Armour] : Libraries.CArmours[0];
                         HairLibrary = Hair < Libraries.CHair.Length ? Libraries.CHair[Hair] : null;
-						#endregion
-
-						#region Weapons
-
-						if (Weapon >= 0)
-						{
-							WeaponLibrary1 = Weapon < Libraries.CWeapons.Length ? Libraries.CWeapons[Weapon] : null;
-							if (WeaponEffect > 0)
-								WeaponEffectLibrary1 = WeaponEffect < Libraries.CWeaponEffect.Length ? Libraries.CWeaponEffect[WeaponEffect] : null;
-							else
-								WeaponEffectLibrary1 = null;
-						}
-						else
-						{
-							WeaponLibrary1 = null;
-							WeaponEffectLibrary1 = null;
-							WeaponLibrary2 = null;
-						}
-
-						#endregion
-
-						#region WingEffects
-						if (WingEffect > 0 && WingEffect < 100)
-                        {
-                            WingLibrary = (WingEffect - 1) < Libraries.CHumEffect.Length ? Libraries.CHumEffect[WingEffect - 1] : null;
-                        }
-                        #endregion
-
-                        #region Offsets
-                        ArmourOffSet = Gender == MirGender.Male ? 0 : 808;
-                        HairOffSet = Gender == MirGender.Male ? 0 : 808;
-                        WeaponOffSet = Gender == MirGender.Male ? 0 : 416;
-                        WingOffset = Gender == MirGender.Male ? 0 : 840;
-                        MountOffset = 0;
-                        #endregion
-
-                        break;
+                    }
                     #endregion
-                }
+
+                    #region Weapons
+                    if (HasClassWeapon)
+                    {
+                        int Index = Weapon - 200;
+
+                        if (AltAnim)
+                            WeaponLibrary2 = Index < Libraries.ARWeaponsS.Length ? Libraries.ARWeaponsS[Index] : null;
+                        else
+                            WeaponLibrary2 = Index < Libraries.ARWeapons.Length ? Libraries.ARWeapons[Index] : null;
+
+                        WeaponLibrary1 = null;
+                    }
+                    else
+                    {
+                        if (Weapon >= 0)
+                            WeaponLibrary1 = Weapon < Libraries.CWeapons.Length ? Libraries.CWeapons[Weapon] : null;
+                        else
+                            WeaponLibrary1 = null;
+
+                        WeaponLibrary2 = null;
+                    }
+                    #endregion
+
+                    #region WingEffects
+                    if (WingEffect > 0 && WingEffect < 100)
+                    {
+                        if (AltAnim)
+                            WingLibrary = (WingEffect - 1) < Libraries.ARHumEffect.Length ? Libraries.ARHumEffect[WingEffect - 1] : null;
+                        else
+                            WingLibrary = (WingEffect - 1) < Libraries.CHumEffect.Length ? Libraries.CHumEffect[WingEffect - 1] : null;
+                    }
+                    #endregion
+
+                    #region Offsets
+                    ArmourOffSet = Gender == MirGender.Male ? 0 : AltAnim ? 352 : 808;
+                    HairOffSet = Gender == MirGender.Male ? 0 : AltAnim ? 352 : 808;
+                    WeaponOffSet = Gender == MirGender.Male ? 0 : AltAnim ? 352 : 416;
+                    WingOffset = Gender == MirGender.Male ? 0 : AltAnim ? 352 : 840;
+                    MountOffset = 0;
+                    #endregion
+
+                    break;
+                #endregion
+
+
+                #region Assassin
+                case MirClass.Assassin:
+
+                    #region WeaponType
+                    if (HasClassWeapon || Weapon < 0)
+                    {
+                        switch (CurrentAction)
+                        {
+                            case MirAction.Standing:
+                            case MirAction.Stance:
+                            case MirAction.Walking:
+                            case MirAction.Running:
+                            case MirAction.Die:
+                            case MirAction.Struck:
+                            case MirAction.Attack1:
+                            case MirAction.Attack2:
+                            case MirAction.Attack3:
+                            case MirAction.Attack4:
+                            case MirAction.Sneek:
+                            case MirAction.Spell:
+                            case MirAction.DashAttack:
+                                AltAnim = true;
+                                break;
+                        }
+                    }
+                    #endregion
+
+                    #region Armours
+                    if (AltAnim)
+                    {
+                        switch (Armour)
+                        {
+                            case 9: //heaven
+                            case 10: //mir
+                            case 11: //oma
+                            case 12: //spirit
+                                BodyLibrary = Armour + 3 < Libraries.AArmours.Length ? Libraries.AArmours[Armour + 3] : Libraries.AArmours[0];
+                                break;
+
+                            case 19:
+                                BodyLibrary = Armour - 3 < Libraries.AArmours.Length ? Libraries.AArmours[Armour - 3] : Libraries.AArmours[0];
+                                break;
+
+                            case 20:
+                            case 21:
+                            case 22:
+                            case 23: //red bone
+                            case 24:
+                                BodyLibrary = Armour - 17 < Libraries.AArmours.Length ? Libraries.AArmours[Armour - 17] : Libraries.AArmours[0];
+                                break;
+
+                            case 28:
+                            case 29:
+                            case 30:
+                                BodyLibrary = Armour - 20 < Libraries.AArmours.Length ? Libraries.AArmours[Armour - 20] : Libraries.AArmours[0];
+                                break;
+
+                            case 34:
+                                BodyLibrary = Armour - 23 < Libraries.AArmours.Length ? Libraries.AArmours[Armour - 23] : Libraries.AArmours[0];
+                                break;
+
+                            default:
+                                BodyLibrary = Armour < Libraries.AArmours.Length ? Libraries.AArmours[Armour] : Libraries.AArmours[0];
+                                break;
+                        }
+
+                        HairLibrary = Hair < Libraries.AHair.Length ? Libraries.AHair[Hair] : null;
+                    }
+                    else
+                    {
+                        BodyLibrary = Armour < Libraries.CArmours.Length ? Libraries.CArmours[Armour] : Libraries.CArmours[0];
+                        HairLibrary = Hair < Libraries.CHair.Length ? Libraries.CHair[Hair] : null;
+                    }
+                    #endregion
+
+                    #region Weapons
+                    if (HasClassWeapon)
+                    {
+                        int Index = Weapon - 100;
+
+                        WeaponLibrary1 = Index < Libraries.AWeaponsL.Length ? Libraries.AWeaponsR[Index] : null;
+                        WeaponLibrary2 = Index < Libraries.AWeaponsR.Length ? Libraries.AWeaponsL[Index] : null;
+                    }
+                    else
+                    {
+                        if (Weapon >= 0)
+                            WeaponLibrary1 = Weapon < Libraries.CWeapons.Length ? Libraries.CWeapons[Weapon] : null;
+                        else
+                            WeaponLibrary1 = null;
+
+                        WeaponLibrary2 = null;
+                    }
+                    #endregion
+
+                    #region WingEffects
+                    if (WingEffect > 0 && WingEffect < 100)
+                    {
+                        if (AltAnim)
+                            WingLibrary = (WingEffect - 1) < Libraries.AHumEffect.Length ? Libraries.AHumEffect[WingEffect - 1] : null;
+                        else
+                            WingLibrary = (WingEffect - 1) < Libraries.CHumEffect.Length ? Libraries.CHumEffect[WingEffect - 1] : null;
+                    }
+                    #endregion
+
+                    #region Offsets
+                    ArmourOffSet = Gender == MirGender.Male ? 0 : AltAnim ? 512 : 808;
+                    HairOffSet = Gender == MirGender.Male ? 0 : AltAnim ? 512 : 808;
+                    WeaponOffSet = Gender == MirGender.Male ? 0 : AltAnim ? 512 : 416;
+                    WingOffset = Gender == MirGender.Male ? 0 : AltAnim ? 544 : 840;
+                    MountOffset = 0;
+                    #endregion
+
+                    break;
+                #endregion
+
+
+                #region Others
+                case MirClass.Warrior:
+                case MirClass.Taoist:
+                case MirClass.Wizard:
+
+                    #region Armours
+                    BodyLibrary = Armour < Libraries.CArmours.Length ? Libraries.CArmours[Armour] : Libraries.CArmours[0];
+                    HairLibrary = Hair < Libraries.CHair.Length ? Libraries.CHair[Hair] : null;
+                    #endregion
+
+                    #region Weapons
+                    if (Weapon >= 0)
+                        WeaponLibrary1 = Weapon < Libraries.CWeapons.Length ? Libraries.CWeapons[Weapon] : null;
+                    else
+                        WeaponLibrary1 = null;
+                    WeaponLibrary2 = null;
+
+                    #endregion
+
+                    #region WingEffects
+                    if (WingEffect > 0 && WingEffect < 100)
+                    {
+                        WingLibrary = (WingEffect - 1) < Libraries.CHumEffect.Length ? Libraries.CHumEffect[WingEffect - 1] : null;
+                    }
+                    #endregion
+
+                    #region Offsets
+                    ArmourOffSet = Gender == MirGender.Male ? 0 : 808;
+                    HairOffSet = Gender == MirGender.Male ? 0 : 808;
+                    WeaponOffSet = Gender == MirGender.Male ? 0 : 416;
+                    WingOffset = Gender == MirGender.Male ? 0 : 840;
+                    MountOffset = 0;
+                    #endregion
+
+                    break;
+                #endregion
+                #region High War //stupple
+                case MirClass.HighWarrior:
+
+                    #region WeaponType
+                    if (HasClassWeapon)
+                    {
+                        switch (CurrentAction)
+                        {
+                            case MirAction.Standing:
+                            case MirAction.Walking:
+                            case MirAction.Running:
+                            case MirAction.Stance:
+                            case MirAction.Stance2:
+                            case MirAction.Attack1:
+                            case MirAction.Attack2:
+                            case MirAction.Attack3:
+                            case MirAction.Attack4:
+                            case MirAction.Spell:
+                            case MirAction.Harvest:
+                            case MirAction.Struck:
+                            case MirAction.Die:
+                            case MirAction.Dead:
+                            case MirAction.Revive:
+                            case MirAction.DashL:
+                            case MirAction.DashR:
+                                AltAnim = true;
+                                break;
+                        }
+                    }
+
+                    ResetFramePos(AltAnim, 1);
+                    #endregion
+
+                    #region Armours
+                    if (AltAnim)
+                    {
+                        BodyLibrary = Armour < Libraries.UpWarArmours.Length ? Libraries.UpWarArmours[Armour] : Libraries.UpWarArmours[0];
+                        HairLibrary = Hair < Libraries.UpWarHair.Length ? Libraries.UpWarHair[Hair] : null;
+                    }
+                    else
+                    {
+                        int fixArmour = Armour;
+                        switch (Armour)
+                        {
+                            case 0:
+                                fixArmour = 0;
+                                break;
+                            case 1:
+                            case 2:
+                            case 3:
+                            case 4:
+                                fixArmour = (fixArmour - 1) * 5 + 1;
+                                break;
+                            default:
+                                fixArmour = fixArmour + 16;
+                                break;
+                        }
+
+                        BodyLibrary = fixArmour < Libraries.UpCArmours.Length ? Libraries.UpCArmours[fixArmour] : Libraries.UpCArmours[0];
+                        HairLibrary = Hair < Libraries.UpCHair.Length ? Libraries.UpCHair[Hair] : null;
+                    }
+                    #endregion
+
+                    #region Weapons
+                    if (HasClassWeapon)
+                    {
+                        int Index = Weapon - 300;
+
+                        WeaponLibrary1 = Index < Libraries.UpWarWeapons.Length ? Libraries.UpWarWeapons[Index] : null;
+                        WeaponLibrary2 = null;
+                    }
+                    else
+                    {
+                        if (Weapon >= 0)
+                            WeaponLibrary1 = Weapon < Libraries.UpCWeapons.Length ? Libraries.UpCWeapons[Weapon] : null;
+                        else
+                            WeaponLibrary1 = null;
+
+                        WeaponLibrary2 = null;
+                    }
+                    #endregion
+
+                    #region WingEffects
+                    if (WingEffect > 0 && WingEffect < 100)
+                    {
+                        WingLibrary = (WingEffect - 1) < (AltAnim ? Libraries.UpWarHumEffect.Length : Libraries.UpCHumEffect.Length) ? (AltAnim ? Libraries.UpWarHumEffect[WingEffect - 1] : Libraries.UpCHumEffect[WingEffect - 1]) : null;
+                    }
+                    #endregion
+
+                    #region Offsets
+                    ArmourOffSet = Gender == MirGender.Male ? 0 : AltAnim ? 784 : 1112;
+                    HairOffSet = Gender == MirGender.Male ? 0 : AltAnim ? 784 : 1112;
+                    WeaponOffSet = Gender == MirGender.Male ? 0 : AltAnim ? 784 : 600;
+                    WingOffset = Gender == MirGender.Male ? 0 : AltAnim ? 784 : 1112;
+                    MountOffset = 0;
+                    #endregion
+
+                    break;
+                #endregion
+
+                #region High Wiz //stupple
+                case MirClass.HighWizard:
+
+                    #region WeaponType
+                    if (HasClassWeapon)
+                    {
+                        switch (CurrentAction)
+                        {
+                            case MirAction.Standing:
+                            case MirAction.Walking:
+                            case MirAction.Running:
+                            case MirAction.Stance:
+                            case MirAction.Stance2:
+                            case MirAction.Attack1:
+                            case MirAction.Attack2:
+                            case MirAction.Attack3:
+                            case MirAction.Attack4:
+                            case MirAction.Spell:
+                            case MirAction.Harvest:
+                            case MirAction.Struck:
+                            case MirAction.Die:
+                            case MirAction.Dead:
+                            case MirAction.Revive:
+                            case MirAction.DashL:
+                            case MirAction.DashR:
+                                AltAnim = true;
+                                break;
+                        }
+                    }
+
+                    ResetFramePos(AltAnim, 2);
+                    #endregion
+
+                    #region Armours
+                    if (AltAnim)
+                    {
+                        BodyLibrary = Armour < Libraries.UpWizArmours.Length ? Libraries.UpWizArmours[Armour] : Libraries.UpWizArmours[0];
+                        HairLibrary = Hair < Libraries.UpWizHair.Length ? Libraries.UpWizHair[Hair] : null;
+                    }
+                    else
+                    {
+                        int fixArmour = Armour;
+                        switch (Armour)
+                        {
+                            case 0:
+                                fixArmour = 0;
+                                break;
+                            case 1:
+                            case 2:
+                            case 3:
+                            case 4:
+                                fixArmour = (fixArmour - 1) * 5 + 2;
+                                break;
+                            default:
+                                fixArmour = fixArmour + 16;
+                                break;
+                        }
+
+                        BodyLibrary = fixArmour < Libraries.UpCArmours.Length ? Libraries.UpCArmours[fixArmour] : Libraries.UpCArmours[0];
+                        HairLibrary = Hair < Libraries.UpCHair.Length ? Libraries.UpCHair[Hair] : null;
+                    }
+                    #endregion
+
+                    #region Weapons
+                    if (HasClassWeapon)
+                    {
+                        int Index = Weapon - 400;
+
+                        WeaponLibrary1 = Index < Libraries.UpWizWeapons.Length ? Libraries.UpWizWeapons[Index] : null;
+                        WeaponLibrary2 = null;
+                    }
+                    else
+                    {
+                        if (Weapon >= 0)
+                            WeaponLibrary1 = Weapon < Libraries.UpCWeapons.Length ? Libraries.UpCWeapons[Weapon] : null;
+                        else
+                            WeaponLibrary1 = null;
+
+                        WeaponLibrary2 = null;
+                    }
+                    #endregion
+
+                    #region WingEffects
+                    if (WingEffect > 0 && WingEffect < 100)
+                    {
+                        WingLibrary = (WingEffect - 1) < (AltAnim ? Libraries.UpWizHumEffect.Length : Libraries.UpCHumEffect.Length) ? (AltAnim ? Libraries.UpWizHumEffect[WingEffect - 1] : Libraries.UpCHumEffect[WingEffect - 1]) : null;
+                    }
+                    #endregion
+
+                    #region Offsets
+                    ArmourOffSet = Gender == MirGender.Male ? 0 : AltAnim ? 720 : 1112;
+                    HairOffSet = Gender == MirGender.Male ? 0 : AltAnim ? 720 : 1112;
+                    WeaponOffSet = Gender == MirGender.Male ? 0 : AltAnim ? 720 : 600;
+                    WingOffset = Gender == MirGender.Male ? 0 : AltAnim ? 720 : 1112;
+                    MountOffset = 0;
+                    #endregion
+
+                    break;
+                #endregion
+
+                #region High Tao //stupple
+                case MirClass.HighTaoist:
+
+                    #region WeaponType
+                    if (HasClassWeapon)
+                    {
+                        switch (CurrentAction)
+                        {
+                            case MirAction.Standing:
+                            case MirAction.Walking:
+                            case MirAction.Running:
+                            case MirAction.Stance:
+                            case MirAction.Stance2:
+                            case MirAction.Attack1:
+                            case MirAction.Attack2:
+                            case MirAction.Attack3:
+                            case MirAction.Attack4:
+                            case MirAction.Spell:
+                            case MirAction.Harvest:
+                            case MirAction.Struck:
+                            case MirAction.Die:
+                            case MirAction.Dead:
+                            case MirAction.Revive:
+                            case MirAction.DashL:
+                            case MirAction.DashR:
+                                AltAnim = true;
+                                break;
+                        }
+                    }
+
+                    ResetFramePos(AltAnim, 3);
+                    #endregion
+
+                    #region Armours
+                    if (AltAnim)
+                    {
+                        BodyLibrary = Armour < Libraries.UpTaoArmours.Length ? Libraries.UpTaoArmours[Armour] : Libraries.UpTaoArmours[0];
+                        HairLibrary = Hair < Libraries.UpTaoHair.Length ? Libraries.UpTaoHair[Hair] : null;
+                    }
+                    else
+                    {
+                        int fixArmour = Armour;
+                        switch (Armour)
+                        {
+                            case 0:
+                                fixArmour = 0;
+                                break;
+                            case 1:
+                            case 2:
+                            case 3:
+                            case 4:
+                                fixArmour = (fixArmour - 1) * 5 + 3;
+                                break;
+                            default:
+                                fixArmour = fixArmour + 16;
+                                break;
+                        }
+
+                        BodyLibrary = fixArmour < Libraries.UpCArmours.Length ? Libraries.UpCArmours[fixArmour] : Libraries.UpCArmours[0];
+                        HairLibrary = Hair < Libraries.UpCHair.Length ? Libraries.UpCHair[Hair] : null;
+                    }
+                    #endregion
+
+                    #region Weapons
+                    if (HasClassWeapon)
+                    {
+                        int Index = Weapon - 500;
+
+                        WeaponLibrary1 = Index < Libraries.UpTaoWeapons.Length ? Libraries.UpTaoWeapons[Index] : null;
+                        WeaponLibrary2 = null;
+                    }
+                    else
+                    {
+                        if (Weapon >= 0)
+                            WeaponLibrary1 = Weapon < Libraries.UpCWeapons.Length ? Libraries.UpCWeapons[Weapon] : null;
+                        else
+                            WeaponLibrary1 = null;
+
+                        WeaponLibrary2 = null;
+                    }
+                    #endregion
+
+                    #region WingEffects
+                    if (WingEffect > 0 && WingEffect < 100)
+                    {
+                        WingLibrary = (WingEffect - 1) < (AltAnim ? Libraries.UpTaoHumEffect.Length : Libraries.UpCHumEffect.Length) ? (AltAnim ? Libraries.UpTaoHumEffect[WingEffect - 1] : Libraries.UpCHumEffect[WingEffect - 1]) : null;
+                    }
+                    #endregion
+
+                    #region Offsets
+                    ArmourOffSet = Gender == MirGender.Male ? 0 : AltAnim ? 720 : 1112;
+                    HairOffSet = Gender == MirGender.Male ? 0 : AltAnim ? 720 : 1112;
+                    WeaponOffSet = Gender == MirGender.Male ? 0 : AltAnim ? 720 : 600;
+                    WingOffset = Gender == MirGender.Male ? 0 : AltAnim ? 720 : 1112;
+                    MountOffset = 0;
+                    #endregion
+
+                    break;
+                #endregion
+
+                #region High Ass //stupple
+                case MirClass.HighAssassin:
+
+                    #region WeaponType
+                    if (HasClassWeapon)
+                    {
+                        switch (CurrentAction)
+                        {
+                            case MirAction.Standing:
+                            case MirAction.Walking:
+                            case MirAction.Running:
+                            case MirAction.Stance:
+                            case MirAction.Stance2:
+                            case MirAction.Attack1:
+                            case MirAction.Attack2:
+                            case MirAction.Attack3:
+                            case MirAction.Attack4:
+                            case MirAction.Spell:
+                            case MirAction.Harvest:
+                            case MirAction.Struck:
+                            case MirAction.Die:
+                            case MirAction.Dead:
+                            case MirAction.Revive:
+                            case MirAction.DashL:
+                            case MirAction.DashR:
+                            case MirAction.DashAttack:
+                            case MirAction.Sneek:
+                                AltAnim = true;
+                                break;
+                        }
+                    }
+
+                    ResetFramePos(AltAnim, 4);
+                    #endregion
+
+                    #region Armours
+                    if (AltAnim)
+                    {
+                        BodyLibrary = Armour < Libraries.UpAssArmours.Length ? Libraries.UpAssArmours[Armour] : Libraries.UpAssArmours[0];
+                        HairLibrary = Hair < Libraries.UpAssHair.Length ? Libraries.UpAssHair[Hair] : null;
+                    }
+                    else
+                    {
+                        int fixArmour = Armour;
+                        switch (Armour)
+                        {
+                            case 0:
+                                fixArmour = 0;
+                                break;
+                            case 1:
+                            case 2:
+                            case 3:
+                            case 4:
+                                fixArmour = (fixArmour - 1) * 5 + 4;
+                                break;
+                            default:
+                                fixArmour = fixArmour + 16;
+                                break;
+                        }
+
+                        BodyLibrary = fixArmour < Libraries.UpCArmours.Length ? Libraries.UpCArmours[fixArmour] : Libraries.UpCArmours[0];
+                        HairLibrary = Hair < Libraries.UpCHair.Length ? Libraries.UpCHair[Hair] : null;
+                    }
+                    #endregion
+
+                    #region Weapons
+                    if (HasClassWeapon)
+                    {
+                        int Index = Weapon - 600;
+
+                        WeaponLibrary1 = Index < Libraries.UpAssWeaponsR.Length ? Libraries.UpAssWeaponsR[Index] : null;
+                        WeaponLibrary2 = Index < Libraries.UpAssWeaponsL.Length ? Libraries.UpAssWeaponsL[Index] : null;
+                    }
+                    else
+                    {
+                        if (Weapon >= 0)
+                            WeaponLibrary1 = Weapon < Libraries.UpCWeapons.Length ? Libraries.UpCWeapons[Weapon] : null;
+                        else
+                            WeaponLibrary1 = null;
+
+                        WeaponLibrary2 = null;
+                    }
+                    #endregion
+
+                    #region WingEffects
+                    if (WingEffect > 0 && WingEffect < 100)
+                    {
+                        WingLibrary = (WingEffect - 1) < (AltAnim ? Libraries.UpAssHumEffect.Length : Libraries.UpCHumEffect.Length) ? (AltAnim ? Libraries.UpAssHumEffect[WingEffect - 1] : Libraries.UpCHumEffect[WingEffect - 1]) : null;
+                    }
+                    #endregion
+
+                    #region Offsets
+                    ArmourOffSet = Gender == MirGender.Male ? 0 : AltAnim ? 912 : 1112;
+                    HairOffSet = Gender == MirGender.Male ? 0 : AltAnim ? 912 : 1112;
+                    WeaponOffSet = Gender == MirGender.Male ? 0 : AltAnim ? 912 : 600;
+                    WingOffset = Gender == MirGender.Male ? 0 : AltAnim ? 912 : 1112;
+                    MountOffset = 0;
+                    #endregion
+
+                    break;
+                #endregion
+
+                #region High Arc //stupple
+                case MirClass.HighArcher:
+
+                    #region WeaponType
+                    if (HasClassWeapon)
+                    {
+                        switch (CurrentAction)
+                        {
+                            case MirAction.Walking:
+                            case MirAction.Running:
+                            case MirAction.AttackRange1:
+                            case MirAction.AttackRange2:
+                            case MirAction.AttackRange3:
+                            case MirAction.Jump:
+                                AltAnim = true;
+                                break;
+                        }
+                    }
+
+                    ResetFramePos(AltAnim, 5);
+                    #endregion
+
+                    #region Armours
+                    if (AltAnim)
+                    {
+                        BodyLibrary = Armour < Libraries.UpArcArmours.Length ? Libraries.UpArcArmours[Armour] : Libraries.UpArcArmours[0];
+                        HairLibrary = Hair < Libraries.UpArcHair.Length ? Libraries.UpArcHair[Hair] : null;
+                    }
+                    else
+                    {
+                        int fixArmour = Armour;
+                        switch (Armour)
+                        {
+                            case 0:
+                                fixArmour = 0;
+                                break;
+                            case 1:
+                            case 2:
+                            case 3:
+                            case 4:
+                                fixArmour = (fixArmour - 1) * 5 + 5;
+                                break;
+                            default:
+                                fixArmour = fixArmour + 16;
+                                break;
+                        }
+
+                        BodyLibrary = fixArmour < Libraries.UpCArmours.Length ? Libraries.UpCArmours[fixArmour] : Libraries.UpCArmours[0];
+                        HairLibrary = Hair < Libraries.UpCHair.Length ? Libraries.UpCHair[Hair] : null;
+                    }
+                    #endregion
+
+                    #region Weapons
+                    if (HasClassWeapon)
+                    {
+                        int Index = Weapon - 700;
+
+                        if (AltAnim)
+                            WeaponLibrary2 = Index < Libraries.UpArcWeapons.Length ? Libraries.UpArcWeapons[Index] : null;
+                        else
+                            WeaponLibrary2 = Index < Libraries.UpArcWeaponsS.Length ? Libraries.UpArcWeaponsS[Index] : null;
+
+                        WeaponLibrary1 = null;
+                    }
+                    else
+                    {
+                        if (Weapon >= 0)
+                            WeaponLibrary1 = Weapon < Libraries.UpCWeapons.Length ? Libraries.UpCWeapons[Weapon] : null;
+                        else
+                            WeaponLibrary1 = null;
+
+                        WeaponLibrary2 = null;
+                    }
+                    #endregion
+
+                    #region WingEffects
+                    if (WingEffect > 0 && WingEffect < 100)
+                    {
+                        WingLibrary = (WingEffect - 1) < (AltAnim ? Libraries.UpArcHumEffect.Length : Libraries.UpCHumEffect.Length) ? (AltAnim ? Libraries.UpArcHumEffect[WingEffect - 1] : Libraries.UpCHumEffect[WingEffect - 1]) : null;
+                    }
+                    #endregion
+
+                    #region Offsets
+                    ArmourOffSet = Gender == MirGender.Male ? 0 : AltAnim ? 384 : 1112;
+                    HairOffSet = Gender == MirGender.Male ? 0 : AltAnim ? 384 : 1112;
+                    WeaponOffSet = Gender == MirGender.Male ? 0 : AltAnim ? 384 : 600;
+                    WingOffset = Gender == MirGender.Male ? 0 : AltAnim ? 384 : 1112;
+                    MountOffset = 0;
+                    #endregion
+
+                    break;
+                #endregion
+
+                #region 중복처리_주석화
+                /*
+                #region High War //stupple
+                case MirClass.HighWarrior:
+
+                    #region WeaponType
+                    if (HasClassWeapon)
+                    {
+                        switch (CurrentAction)
+                        {
+                            case MirAction.Standing:
+                            case MirAction.Walking:
+                            case MirAction.Running:
+                            case MirAction.Stance:
+                            case MirAction.Stance2:
+                            case MirAction.Attack1:
+                            case MirAction.Attack2:
+                            case MirAction.Attack3:
+                            case MirAction.Attack4:
+                            case MirAction.Spell:
+                            case MirAction.Harvest:
+                            case MirAction.Struck:
+                            case MirAction.Die:
+                            case MirAction.Dead:
+                            case MirAction.Revive:
+                            case MirAction.DashL:
+                            case MirAction.DashR:
+                                AltAnim = true;
+                                break;
+                        }
+                    }
+
+                    ResetFramePos(AltAnim, 1);
+                    #endregion
+
+                    #region Armours
+                    if (AltAnim)
+                    {
+                        BodyLibrary = Armour < Libraries.UpWarArmours.Length ? Libraries.UpWarArmours[Armour] : Libraries.UpWarArmours[0];
+                        HairLibrary = Hair < Libraries.UpWarHair.Length ? Libraries.UpWarHair[Hair] : null;
+                    }
+                    else
+                    {
+                        int fixArmour = Armour;
+                        switch (Armour)
+                        {
+                            case 0:
+                                fixArmour = 0;
+                                break;
+                            case 1:
+                            case 2:
+                            case 3:
+                            case 4:
+                                fixArmour = (fixArmour - 1) * 5 + 1;
+                                break;
+                            default:
+                                fixArmour = fixArmour + 16;
+                                break;
+                        }
+
+                        BodyLibrary = fixArmour < Libraries.UpCArmours.Length ? Libraries.UpCArmours[fixArmour] : Libraries.UpCArmours[0];
+                        HairLibrary = Hair < Libraries.UpCHair.Length ? Libraries.UpCHair[Hair] : null;
+                    }
+                    #endregion
+
+                    #region Weapons
+                    if (HasClassWeapon)
+                    {
+                        int Index = Weapon - 300;
+
+                        WeaponLibrary1 = Index < Libraries.UpWarWeapons.Length ? Libraries.UpWarWeapons[Index] : null;
+                        WeaponLibrary2 = null;
+                    }
+                    else
+                    {
+                        if (Weapon >= 0)
+                            WeaponLibrary1 = Weapon < Libraries.UpCWeapons.Length ? Libraries.UpCWeapons[Weapon] : null;
+                        else
+                            WeaponLibrary1 = null;
+
+                        WeaponLibrary2 = null;
+                    }
+                    #endregion
+
+                    #region WingEffects
+                    if (WingEffect > 0 && WingEffect < 100)
+                    {
+                        WingLibrary = (WingEffect - 1) < (AltAnim ? Libraries.UpWarHumEffect.Length : Libraries.UpCHumEffect.Length) ? (AltAnim ? Libraries.UpWarHumEffect[WingEffect - 1] : Libraries.UpCHumEffect[WingEffect - 1]) : null;
+                    }
+                    #endregion
+
+                    #region Offsets
+                    ArmourOffSet = Gender == MirGender.Male ? 0 : AltAnim ? 784 : 1112;
+                    HairOffSet = Gender == MirGender.Male ? 0 : AltAnim ? 784 : 1112;
+                    WeaponOffSet = Gender == MirGender.Male ? 0 : AltAnim ? 784 : 600;
+                    WingOffset = Gender == MirGender.Male ? 0 : AltAnim ? 784 : 1112;
+                    MountOffset = 0;
+                    #endregion
+
+                    break;
+                #endregion
+
+                #region High Wiz //stupple
+                case MirClass.HighWizard:
+
+                    #region WeaponType
+                    if (HasClassWeapon)
+                    {
+                        switch (CurrentAction)
+                        {
+                            case MirAction.Standing:
+                            case MirAction.Walking:
+                            case MirAction.Running:
+                            case MirAction.Stance:
+                            case MirAction.Stance2:
+                            case MirAction.Attack1:
+                            case MirAction.Attack2:
+                            case MirAction.Attack3:
+                            case MirAction.Attack4:
+                            case MirAction.Spell:
+                            case MirAction.Harvest:
+                            case MirAction.Struck:
+                            case MirAction.Die:
+                            case MirAction.Dead:
+                            case MirAction.Revive:
+                            case MirAction.DashL:
+                            case MirAction.DashR:
+                                AltAnim = true;
+                                break;
+                        }
+                    }
+
+                    ResetFramePos(AltAnim, 2);
+                    #endregion
+
+                    #region Armours
+                    if (AltAnim)
+                    {
+                        BodyLibrary = Armour < Libraries.UpWizArmours.Length ? Libraries.UpWizArmours[Armour] : Libraries.UpWizArmours[0];
+                        HairLibrary = Hair < Libraries.UpWizHair.Length ? Libraries.UpWizHair[Hair] : null;
+                    }
+                    else
+                    {
+                        int fixArmour = Armour;
+                        switch (Armour)
+                        {
+                            case 0:
+                                fixArmour = 0;
+                                break;
+                            case 1:
+                            case 2:
+                            case 3:
+                            case 4:
+                                fixArmour = (fixArmour - 1) * 5 + 2;
+                                break;
+                            default:
+                                fixArmour = fixArmour + 16;
+                                break;
+                        }
+
+                        BodyLibrary = fixArmour < Libraries.UpCArmours.Length ? Libraries.UpCArmours[fixArmour] : Libraries.UpCArmours[0];
+                        HairLibrary = Hair < Libraries.UpCHair.Length ? Libraries.UpCHair[Hair] : null;
+                    }
+                    #endregion
+
+                    #region Weapons
+                    if (HasClassWeapon)
+                    {
+                        int Index = Weapon - 400;
+
+                        WeaponLibrary1 = Index < Libraries.UpWizWeapons.Length ? Libraries.UpWizWeapons[Index] : null;
+                        WeaponLibrary2 = null;
+                    }
+                    else
+                    {
+                        if (Weapon >= 0)
+                            WeaponLibrary1 = Weapon < Libraries.UpCWeapons.Length ? Libraries.UpCWeapons[Weapon] : null;
+                        else
+                            WeaponLibrary1 = null;
+
+                        WeaponLibrary2 = null;
+                    }
+                    #endregion
+
+                    #region WingEffects
+                    if (WingEffect > 0 && WingEffect < 100)
+                    {
+                        WingLibrary = (WingEffect - 1) < (AltAnim ? Libraries.UpWizHumEffect.Length : Libraries.UpCHumEffect.Length) ? (AltAnim ? Libraries.UpWizHumEffect[WingEffect - 1] : Libraries.UpCHumEffect[WingEffect - 1]) : null;
+                    }
+                    #endregion
+
+                    #region Offsets
+                    ArmourOffSet = Gender == MirGender.Male ? 0 : AltAnim ? 720 : 1112;
+                    HairOffSet = Gender == MirGender.Male ? 0 : AltAnim ? 720 : 1112;
+                    WeaponOffSet = Gender == MirGender.Male ? 0 : AltAnim ? 720 : 600;
+                    WingOffset = Gender == MirGender.Male ? 0 : AltAnim ? 720 : 1112;
+                    MountOffset = 0;
+                    #endregion
+
+                    break;
+                #endregion
+
+                #region High Tao //stupple
+                case MirClass.HighTaoist:
+
+                    #region WeaponType
+                    if (HasClassWeapon)
+                    {
+                        switch (CurrentAction)
+                        {
+                            case MirAction.Standing:
+                            case MirAction.Walking:
+                            case MirAction.Running:
+                            case MirAction.Stance:
+                            case MirAction.Stance2:
+                            case MirAction.Attack1:
+                            case MirAction.Attack2:
+                            case MirAction.Attack3:
+                            case MirAction.Attack4:
+                            case MirAction.Spell:
+                            case MirAction.Harvest:
+                            case MirAction.Struck:
+                            case MirAction.Die:
+                            case MirAction.Dead:
+                            case MirAction.Revive:
+                            case MirAction.DashL:
+                            case MirAction.DashR:
+                                AltAnim = true;
+                                break;
+                        }
+                    }
+
+                    ResetFramePos(AltAnim, 3);
+                    #endregion
+
+                    #region Armours
+                    if (AltAnim)
+                    {
+                        BodyLibrary = Armour < Libraries.UpTaoArmours.Length ? Libraries.UpTaoArmours[Armour] : Libraries.UpTaoArmours[0];
+                        HairLibrary = Hair < Libraries.UpTaoHair.Length ? Libraries.UpTaoHair[Hair] : null;
+                    }
+                    else
+                    {
+                        int fixArmour = Armour;
+                        switch (Armour)
+                        {
+                            case 0:
+                                fixArmour = 0;
+                                break;
+                            case 1:
+                            case 2:
+                            case 3:
+                            case 4:
+                                fixArmour = (fixArmour - 1) * 5 + 3;
+                                break;
+                            default:
+                                fixArmour = fixArmour + 16;
+                                break;
+                        }
+
+                        BodyLibrary = fixArmour < Libraries.UpCArmours.Length ? Libraries.UpCArmours[fixArmour] : Libraries.UpCArmours[0];
+                        HairLibrary = Hair < Libraries.UpCHair.Length ? Libraries.UpCHair[Hair] : null;
+                    }
+                    #endregion
+
+                    #region Weapons
+                    if (HasClassWeapon)
+                    {
+                        int Index = Weapon - 500;
+
+                        WeaponLibrary1 = Index < Libraries.UpTaoWeapons.Length ? Libraries.UpTaoWeapons[Index] : null;
+                        WeaponLibrary2 = null;
+                    }
+                    else
+                    {
+                        if (Weapon >= 0)
+                            WeaponLibrary1 = Weapon < Libraries.UpCWeapons.Length ? Libraries.UpCWeapons[Weapon] : null;
+                        else
+                            WeaponLibrary1 = null;
+
+                        WeaponLibrary2 = null;
+                    }
+                    #endregion
+
+                    #region WingEffects
+                    if (WingEffect > 0 && WingEffect < 100)
+                    {
+                        WingLibrary = (WingEffect - 1) < (AltAnim ? Libraries.UpTaoHumEffect.Length : Libraries.UpCHumEffect.Length) ? (AltAnim ? Libraries.UpTaoHumEffect[WingEffect - 1] : Libraries.UpCHumEffect[WingEffect - 1]) : null;
+                    }
+                    #endregion
+
+                    #region Offsets
+                    ArmourOffSet = Gender == MirGender.Male ? 0 : AltAnim ? 720 : 1112;
+                    HairOffSet = Gender == MirGender.Male ? 0 : AltAnim ? 720 : 1112;
+                    WeaponOffSet = Gender == MirGender.Male ? 0 : AltAnim ? 720 : 600;
+                    WingOffset = Gender == MirGender.Male ? 0 : AltAnim ? 720 : 1112;
+                    MountOffset = 0;
+                    #endregion
+
+                    break;
+                #endregion
+
+                #region High Ass //stupple
+                case MirClass.HighAssassin:
+
+                    #region WeaponType
+                    if (HasClassWeapon)
+                    {
+                        switch (CurrentAction)
+                        {
+                            case MirAction.Standing:
+                            case MirAction.Walking:
+                            case MirAction.Running:
+                            case MirAction.Stance:
+                            case MirAction.Stance2:
+                            case MirAction.Attack1:
+                            case MirAction.Attack2:
+                            case MirAction.Attack3:
+                            case MirAction.Attack4:
+                            case MirAction.Spell:
+                            case MirAction.Harvest:
+                            case MirAction.Struck:
+                            case MirAction.Die:
+                            case MirAction.Dead:
+                            case MirAction.Revive:
+                            case MirAction.DashL:
+                            case MirAction.DashR:
+                            case MirAction.DashAttack:
+                            case MirAction.Sneek:
+                                AltAnim = true;
+                                break;
+                        }
+                    }
+
+                    ResetFramePos(AltAnim, 4);
+                    #endregion
+
+                    #region Armours
+                    if (AltAnim)
+                    {
+                        BodyLibrary = Armour < Libraries.UpAssArmours.Length ? Libraries.UpAssArmours[Armour] : Libraries.UpAssArmours[0];
+                        HairLibrary = Hair < Libraries.UpAssHair.Length ? Libraries.UpAssHair[Hair] : null;
+                    }
+                    else
+                    {
+                        int fixArmour = Armour;
+                        switch (Armour)
+                        {
+                            case 0:
+                                fixArmour = 0;
+                                break;
+                            case 1:
+                            case 2:
+                            case 3:
+                            case 4:
+                                fixArmour = (fixArmour - 1) * 5 + 4;
+                                break;
+                            default:
+                                fixArmour = fixArmour + 16;
+                                break;
+                        }
+
+                        BodyLibrary = fixArmour < Libraries.UpCArmours.Length ? Libraries.UpCArmours[fixArmour] : Libraries.UpCArmours[0];
+                        HairLibrary = Hair < Libraries.UpCHair.Length ? Libraries.UpCHair[Hair] : null;
+                    }
+                    #endregion
+
+                    #region Weapons
+                    if (HasClassWeapon)
+                    {
+                        int Index = Weapon - 600;
+
+                        WeaponLibrary1 = Index < Libraries.UpAssWeaponsR.Length ? Libraries.UpAssWeaponsR[Index] : null;
+                        WeaponLibrary2 = Index < Libraries.UpAssWeaponsL.Length ? Libraries.UpAssWeaponsL[Index] : null;
+                    }
+                    else
+                    {
+                        if (Weapon >= 0)
+                            WeaponLibrary1 = Weapon < Libraries.UpCWeapons.Length ? Libraries.UpCWeapons[Weapon] : null;
+                        else
+                            WeaponLibrary1 = null;
+
+                        WeaponLibrary2 = null;
+                    }
+                    #endregion
+
+                    #region WingEffects
+                    if (WingEffect > 0 && WingEffect < 100)
+                    {
+                        WingLibrary = (WingEffect - 1) < (AltAnim ? Libraries.UpAssHumEffect.Length : Libraries.UpCHumEffect.Length) ? (AltAnim ? Libraries.UpAssHumEffect[WingEffect - 1] : Libraries.UpCHumEffect[WingEffect - 1]) : null;
+                    }
+                    #endregion
+
+                    #region Offsets
+                    ArmourOffSet = Gender == MirGender.Male ? 0 : AltAnim ? 912 : 1112;
+                    HairOffSet = Gender == MirGender.Male ? 0 : AltAnim ? 912 : 1112;
+                    WeaponOffSet = Gender == MirGender.Male ? 0 : AltAnim ? 912 : 600;
+                    WingOffset = Gender == MirGender.Male ? 0 : AltAnim ? 912 : 1112;
+                    MountOffset = 0;
+                    #endregion
+
+                    break;
+                #endregion
+
+                #region High Arc //stupple
+                case MirClass.HighArcher:
+
+                    #region WeaponType
+                    if (HasClassWeapon)
+                    {
+                        switch (CurrentAction)
+                        {
+                            case MirAction.Walking:
+                            case MirAction.Running:
+                            case MirAction.AttackRange1:
+                            case MirAction.AttackRange2:
+                            case MirAction.AttackRange3:
+                            case MirAction.Jump:
+                                AltAnim = true;
+                                break;
+                        }
+                    }
+
+                    ResetFramePos(AltAnim, 5);
+                    #endregion
+
+                    #region Armours
+                    if (AltAnim)
+                    {
+                        BodyLibrary = Armour < Libraries.UpArcArmours.Length ? Libraries.UpArcArmours[Armour] : Libraries.UpArcArmours[0];
+                        HairLibrary = Hair < Libraries.UpArcHair.Length ? Libraries.UpArcHair[Hair] : null;
+                    }
+                    else
+                    {
+                        int fixArmour = Armour;
+                        switch (Armour)
+                        {
+                            case 0:
+                                fixArmour = 0;
+                                break;
+                            case 1:
+                            case 2:
+                            case 3:
+                            case 4:
+                                fixArmour = (fixArmour - 1) * 5 + 5;
+                                break;
+                            default:
+                                fixArmour = fixArmour + 16;
+                                break;
+                        }
+
+                        BodyLibrary = fixArmour < Libraries.UpCArmours.Length ? Libraries.UpCArmours[fixArmour] : Libraries.UpCArmours[0];
+                        HairLibrary = Hair < Libraries.UpCHair.Length ? Libraries.UpCHair[Hair] : null;
+                    }
+                    #endregion
+
+                    #region Weapons
+                    if (HasClassWeapon)
+                    {
+                        int Index = Weapon - 700;
+
+                        if (AltAnim)
+                            WeaponLibrary2 = Index < Libraries.UpArcWeapons.Length ? Libraries.UpArcWeapons[Index] : null;
+                        else
+                            WeaponLibrary2 = Index < Libraries.UpArcWeaponsS.Length ? Libraries.UpArcWeaponsS[Index] : null;
+
+                        WeaponLibrary1 = null;
+                    }
+                    else
+                    {
+                        if (Weapon >= 0)
+                            WeaponLibrary1 = Weapon < Libraries.UpCWeapons.Length ? Libraries.UpCWeapons[Weapon] : null;
+                        else
+                            WeaponLibrary1 = null;
+
+                        WeaponLibrary2 = null;
+                    }
+                    #endregion
+
+                    #region WingEffects
+                    if (WingEffect > 0 && WingEffect < 100)
+                    {
+                        WingLibrary = (WingEffect - 1) < (AltAnim ? Libraries.UpArcHumEffect.Length : Libraries.UpCHumEffect.Length) ? (AltAnim ? Libraries.UpArcHumEffect[WingEffect - 1] : Libraries.UpCHumEffect[WingEffect - 1]) : null;
+                    }
+                    #endregion
+
+                    #region Offsets
+                    ArmourOffSet = Gender == MirGender.Male ? 0 : AltAnim ? 384 : 1112;
+                    HairOffSet = Gender == MirGender.Male ? 0 : AltAnim ? 384 : 1112;
+                    WeaponOffSet = Gender == MirGender.Male ? 0 : AltAnim ? 384 : 600;
+                    WingOffset = Gender == MirGender.Male ? 0 : AltAnim ? 384 : 1112;
+                    MountOffset = 0;
+                    #endregion
+
+                    break;
+                    #endregion
+                */
+                #endregion
             }
 
             #region Common
             //Harvest
-            if (CurrentAction == MirAction.Harvest && TransformType < 0)
-            {
+            if (CurrentAction == MirAction.Harvest)
                 WeaponLibrary1 = 1 < Libraries.CWeapons.Length ? Libraries.CWeapons[1] : null;
-            }
 
             //Mounts
-            if (MountType > -1 && RidingMount && showMount)
+            if (MountType > -1 && RidingMount)
             {
                 MountLibrary = MountType < Libraries.Mounts.Length ? Libraries.Mounts[MountType] : null;
             }
@@ -655,13 +1552,22 @@ namespace Client.MirObjects
             }
 
             //Fishing
-            if (HasFishingRod && showFishing)
+            if (HasFishingRod)
             {
                 if (CurrentAction == MirAction.FishingCast || CurrentAction == MirAction.FishingWait || CurrentAction == MirAction.FishingReel)
                 {
-                    WeaponLibrary1 = 0 < Libraries.Fishing.Length ? Libraries.Fishing[Weapon - 49] : null;
-                    WeaponLibrary2 = null;
-                    WeaponOffSet = -632;
+                    if (Class < MirClass.HighWarrior)//stupple
+                    {
+                        WeaponLibrary1 = 0 < Libraries.Fishing.Length ? Libraries.Fishing[Weapon - 49] : null;
+                        WeaponLibrary2 = null;
+                        WeaponOffSet = -632;
+                    }
+                    else
+                    {
+                        WeaponLibrary1 = 0 < (Gender == MirGender.Male ? Libraries.UpFishingM.Length : Libraries.UpFishingF.Length) ? (Gender == MirGender.Male ? Libraries.UpFishingM[Weapon - 49] : Libraries.UpFishingF[Weapon - 49]) : null;
+                        WeaponLibrary2 = null;
+                        WeaponOffSet = -600;
+                    }
                 }
             }
 
@@ -952,7 +1858,7 @@ namespace Client.MirObjects
 
                 if (CurrentAction == MirAction.Standing)
                 {
-                    if (Class == MirClass.Archer && HasClassWeapon)
+                    if ((Class == MirClass.Archer || Class == MirClass.HighArcher) && HasClassWeapon)
                         CurrentAction = MirAction.Standing;
                     else
                         CurrentAction = CMain.Time > StanceTime ? MirAction.Standing : MirAction.Stance;
@@ -1081,10 +1987,12 @@ namespace Client.MirObjects
                         switch (Class)
                         {
                             case MirClass.Archer:
+                            case MirClass.HighArcher:
                                 Frames.Frames.TryGetValue(CurrentAction, out Frame);
                                 break;
                             case MirClass.Assassin:
-                                if(GameScene.DoubleSlash)
+                            case MirClass.HighAssassin:
+                                if (GameScene.DoubleSlash)
                                     Frames.Frames.TryGetValue(MirAction.Attack1, out Frame);
                                 else if (CMain.Shift)
                                     Frames.Frames.TryGetValue(CMain.Random.Next(100) >= 20 ? (CMain.Random.Next(100) > 40 ? MirAction.Attack1 : MirAction.Attack4) : (CMain.Random.Next(100) > 10 ? MirAction.Attack2 : MirAction.Attack3), out Frame);
@@ -1092,7 +2000,7 @@ namespace Client.MirObjects
                                     Frames.Frames.TryGetValue(CMain.Random.Next(100) >= 40 ? MirAction.Attack1 : MirAction.Attack4, out Frame);
                                 break;
                             default:
-                                if (CMain.Shift && TargetObject == null)
+                                if (CMain.Shift && GameScene.Thrusting != true && TargetObject == null)
                                     Frames.Frames.TryGetValue(CMain.Random.Next(100) >= 20 ? MirAction.Attack1 : MirAction.Attack3, out Frame);
                                 else
                                     Frames.Frames.TryGetValue(CurrentAction, out Frame);
@@ -1292,7 +2200,7 @@ namespace Client.MirObjects
                 }
 
                 //ArcherTest - Need to check for bow weapon only
-                if (Class == MirClass.Archer && HasClassWeapon)
+                if ((Class == MirClass.Archer || Class == MirClass.HighArcher) && HasClassWeapon) //stupple
                 {
                     switch (CurrentAction)
                     {
@@ -1306,7 +2214,8 @@ namespace Client.MirObjects
                 }
 
                 //Assassin sneekyness
-                if (Class == MirClass.Assassin && Sneaking && (CurrentAction == MirAction.Walking || CurrentAction == MirAction.Running))
+                //if (Class == MirClass.Assassin && Sneaking && (CurrentAction == MirAction.Walking || CurrentAction == MirAction.Running))
+                if ((Class == MirClass.Assassin || Class == MirClass.HighAssassin) && Sneaking && (CurrentAction == MirAction.Walking || CurrentAction == MirAction.Running))
                 {
                     Frames.Frames.TryGetValue(MirAction.Sneek, out Frame);
                 }
@@ -1625,7 +2534,8 @@ namespace Client.MirObjects
                             if (ob.Race != ObjectType.Player) break;
                             PlayerObject player = ((PlayerObject)ob);
                             StruckWeapon = player.Weapon;
-                            if (player.Class != MirClass.Assassin || StruckWeapon == -1) break;
+                            //if (player.Class != MirClass.Assassin || StruckWeapon == -1) break;
+                            if (player.Class != MirClass.Assassin || player.Class != MirClass.HighAssassin || StruckWeapon == -1) break;
                             StruckWeapon = 1;
                             break;
                         }
@@ -4669,7 +5579,7 @@ namespace Client.MirObjects
             }
 
             int add = 0;
-            if (Class != MirClass.Assassin) //Archer to add?
+            if (Class != MirClass.Assassin || Class != MirClass.HighAssassin)//stupple //Archer to add?
                 switch (Armour)
                 {
                     case 3:
@@ -4756,13 +5666,24 @@ namespace Client.MirObjects
                 return;
             }
 
-            if (Weapon >= 0 && Class == MirClass.Assassin)
+            if (Weapon >= 0 && (Class == MirClass.Assassin || Class == MirClass.HighAssassin))
             {
                 SoundManager.PlaySound(SoundList.SwingShort);
                 return;
             }
 
-            if (Class == MirClass.Archer && HasClassWeapon)
+            if (Weapon >= 0 && Class == MirClass.HighWarrior)//stupple
+            {
+                switch (Weapon)
+                {
+                    default:
+                        SoundManager.PlaySound(SoundList.SwingSword);
+                        break;
+                }
+                return;
+            }
+
+            if ((Class == MirClass.Archer || Class == MirClass.HighArcher) && HasClassWeapon)
             {
                 return;
             }
@@ -4871,6 +5792,8 @@ namespace Client.MirObjects
                     DrawWeapon();
                 else
                     DrawWeapon2();
+
+
             }
 
             DrawBody();
@@ -4900,7 +5823,7 @@ namespace Client.MirObjects
                 else
                     DrawWeapon2();
 
-                if (Class == MirClass.Archer && HasClassWeapon)
+                if (Class == MirClass.Archer || Class == MirClass.HighArcher && HasClassWeapon)///stupple
                     DrawWeapon2();
             }
 

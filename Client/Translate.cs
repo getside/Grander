@@ -43,6 +43,7 @@ namespace Client
         }
     }
 
+    #region Korean
     public class Korean : Translate
     {
         public override string UserInterface(int Code)
@@ -105,5 +106,69 @@ namespace Client
             return null;
         }
     }
+    #endregion
+    #region English
+    public class English : Translate
+    {
+        public override string UserInterface(int Code)
+        {
+            switch (Code)
+            {
+                case 0: return null;
+            }
 
+            return null;
+        }
+
+        public override string Map(int Code)
+        {
+            switch (Code)
+            {
+                case 0: return null;
+            }
+
+            return null;
+        }
+
+        public override string Item(int Code)
+        {
+            switch (Code)
+            {
+                case 0: return null;
+            }
+
+            return null;
+        }
+
+        public override string Monster(int Code)
+        {
+            switch (Code)
+            {
+                case 0: return null;
+            }
+
+            return null;
+        }
+
+        public override string NPC(int Code)
+        {
+            switch (Code)
+            {
+                case 0: return null;
+            }
+
+            return null;
+        }
+
+        public override string Skill(int Code)
+        {
+            switch (Code)
+            {
+                case 0: return null;
+            }
+
+            return null;
+        }
+    }
+    #endregion
 }

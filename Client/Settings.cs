@@ -110,6 +110,7 @@ namespace Client
         public static int MaxFPS = 100;
         public static int Resolution = 1024;
         public static bool DebugMode = false;
+        public static string Language = "ENG";
 
         //Network
         public static bool UseConfig = false;
@@ -223,6 +224,16 @@ namespace Client
             FPSCap = Reader.ReadBoolean("Graphics", "FPSCap", FPSCap);
             Resolution = Reader.ReadInt32("Graphics", "Resolution", Resolution);
             DebugMode = Reader.ReadBoolean("Graphics", "DebugMode", DebugMode);
+            Language = Reader.ReadString("Graphics", "Language", Language);
+
+            switch (Language.ToUpper())
+            {
+                case "KOR":
+                    CMain.Translate = new Korean(); break;
+                case "ENG":
+                default:
+                    CMain.Translate = new English(); break;
+            }
 
             //Network
             UseConfig = Reader.ReadBoolean("Network", "UseConfig", UseConfig);
@@ -309,6 +320,7 @@ namespace Client
             Reader.Write("Graphics", "FPSCap", FPSCap);
             Reader.Write("Graphics", "Resolution", Resolution);
             Reader.Write("Graphics", "DebugMode", DebugMode);
+            Reader.Write("Graphics", "Language", Language);
 
             //Sound
             Reader.Write("Sound", "Volume", Volume);
